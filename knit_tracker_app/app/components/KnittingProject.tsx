@@ -2,6 +2,11 @@
 
 import React, { useState } from "react";
 import knitGrid from "./KnittingGrid.module.css"
+import {setNameOfProject, setStitches, setNeedleType, setNeedleSize, setYarnMaterial, setYarnWeight, setYarnYardage, setProgressGrid, reformatGrid} from "../redux/slices/knittingProjectSlice"
+import {useDispatch} from "react-redux"
+import {AppDispatch } from "../redux/store";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/store";
 
 type Stitches = string
 
@@ -11,11 +16,12 @@ type KnittingGridProps = {
     nameOfProject: string
 }
 
+// Info for needles
 interface needles {
     type: string
     size: number
 }
-
+// Info for yarn
 interface yarn {
     material: string
     weight: number
@@ -32,6 +38,7 @@ function createKnitProject(stitches: number, rows: number): Stitches[][] {
 /* The grid to store a persons knitting project progress/information */
 // stitches refers to the amount of cast-on stitches to start the project
 export default function KnittingProject({stitches, nameOfProject} : KnittingGridProps) {
+
     const [selectedStitches, setSelectedStitches] = useState<Set<string>>(new Set())
     const [selectedNeedles, setSelectedNeedless] = useState<needles>()
     const [currentPosition, setCurrentPosition] = useState<string>(`${stitches},20`)
@@ -41,8 +48,13 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
     const [knittingGrid, setKnittingGrid] = useState<Stitches[][]>(() => createKnitProject(stitches, 20)) // Creates the grid
     const [projectName, setProjectName] = useState<string>(() => nameOfProject) // Change project name
 
+    const knittingProject = useSelector((state: RootState) => state.knittingProject)
+    const dispatch = useDispatch<AppDispatch>();
+
     // Updates the stitch at it's given row and column
     function updateIndividualStitch(stitchRow: number, stitchCol: number, stitchType: Stitches) {
+
+        /*
         setKnittingGrid(prevKnitGrid => {
             const updatedKnitGrid = prevKnitGrid.map((row, stitch) => {
                 
@@ -64,6 +76,9 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
             // Return the progress on the project!
             return updatedKnitGrid
         })
+            */
+
+        dispatch(setProgressGrid({stitchRow: stitchRow, col: stitchCol, stitchType: stitchType}))
     }
 
     // User can select multiple stitches to go back if they want to,
@@ -95,23 +110,23 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
             </div >
             <div className={knitGrid.needles}>
                 <p> Needles: </p>
-                <input className={knitGrid.needleInfo} value={selectedNeedles?.type}/>
+                <input className={knitGrid.needleInfo} value={knittingProject?.needles.type} onChange={(e) => dispatch(setNeedleType(e.target.value))}/>
                 <p> Size: </p>
-                <input className={knitGrid.needleInfo} value={selectedNeedles?.size}/>
+                <input className={knitGrid.needleInfo} value={knittingProject?.needles.size} onChange={(e) => dispatch(setNeedleSize(e.target.value))}/>
             </div>
             <div className={knitGrid.yarn}>
                 <p> Material: </p>
-                <input className={knitGrid.yarnInfo} value={selectedYarn?.material}/>
+                <input className={knitGrid.yarnInfo} value={knittingProject?.yarn.material} onChange={(e) => dispatch(setYarnMaterial(e.target.value))}/>
                 <p> Weight: </p>
-                <input className={knitGrid.yarnInfo} value={selectedYarn?.weight}/>
+                <input className={knitGrid.yarnInfo} value={knittingProject?.yarn.weight} onChange={(e) => dispatch(setYarnWeight(e.target.value))}/>
                 <p> Yardage: </p>
-                <input className={knitGrid.yarnInfo} value={selectedYarn?.yardage}/>
+                <input className={knitGrid.yarnInfo} value={knittingProject?.yarn.yardage} onChange={(e) => dispatch(setYarnYardage(e.target.value))}/>
                  <p className="ml-15" >More row info</p>
             </div>            
             </div>
             <table>
                 <tbody>
-                    {knittingGrid.map((row, rowNumber) => (
+                    {knittingProject.progressGrid.map((row, rowNumber) => (
                         <tr key={rowNumber} className={knitGrid.stitchRowLayout}>
                             {/* Set a fixed width and height for row numbers, formatting breaks with numbers > 1000 */}
                             <th className="w-8 h-6">{1 + rowNumber++}</th>
@@ -130,26 +145,48 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                                 // Go to currently selected row
                                 if (event.key === "Enter") {
                                     
+                                    // User wants to go back a row, make sure they really want to and it was not a misclick!
                                     if (rowNumber < Number(currentPosition?.substring(0, currentPosition.indexOf(',')))) {
-                                        const confirmation = confirm(`Are you sure you want to go to row: ${rowNumber}, stich ${colIndex}?`)
+                                        const confirmation = confirm(`Are you sure you want to go to row: ${rowNumber}`)
                                         
                                         // Go to that row
                                         if (confirmation) {
-                                            setKnittingGrid(Array.from({ length: (rowNumber + 1) }, () => Array.from({length: stitches}, () => "")))
+                                           // setKnittingGrid(Array.from({ length: (rowNumber) }, () => Array.from({length: stitches}, () => "")))
+                                            // dispatch(setProgressGrid(Array.from({ length: (rowNumber) }, () => Array.from({length: stitches}, () => ""))))
+                                            // const updatedArray = Array.from({ length: (rowNumber) }, () => Array.from({length: stitches}, () => ""))
+
+                                            // Updates the knitting grid while keeping the old grids values as to not overwrite them when
+                                            // creating a new row.
+                                            const updatedArray = Array.from({ length: rowNumber }, (_, rowIndex) => Array.from( { length: stitches }, 
+                                                (_, colIndex) => knittingProject.progressGrid[rowIndex]?.[colIndex] ?? ""));
+
+                                            dispatch(reformatGrid(updatedArray))
+
                                             setCurrentPosition(`${rowNumber},${colIndex}`)
                                         }
                                         // Do nothing
                                         else {
                                         }
                                     }
+                                    // Update the new position we are at!
                                     else {
-                                        setKnittingGrid(Array.from({ length: rowNumber + 1 }, () => Array.from({length: stitches}, () => "")))
+                                        // setKnittingGrid(Array.from({ length: rowNumber + 1 }, () => Array.from({length: stitches}, () => "")))
+                                        // dispatch(setProgressGrid(Array.from({ length: (rowNumber) }, () => Array.from({length: stitches}, () => ""))))
+                                        //const updatedArray = Array.from({ length: (rowNumber + 1) }, () => Array.from({length: stitches}, () => "")
+                                        
+                                        // Updates the knitting grid while keeping the old grids values as to not overwrite them when
+                                        // creating a new row.
+                                        const updatedArray = Array.from({ length: rowNumber + 1 }, (_, rowIndex) => Array.from( { length: stitches }, 
+                                                (_, colIndex) => knittingProject.progressGrid[rowIndex]?.[colIndex] ?? ""));
+
+                                        dispatch(reformatGrid(updatedArray));
+                                        //dispatch(reformatGrid(updatedArray))
+
                                         setCurrentPosition(`${rowNumber},${colIndex}`)
                                     }
                                 }
-
                             }}
-                            onMouseMove={(e) => selectMultipleStitches(rowNumber - 1, colIndex)}>
+                            onMouseMove={() => selectMultipleStitches(rowNumber - 1, colIndex)}>
                                 <input 
                                     className={knitGrid.stitchInput}
                                     value={stitch}
@@ -167,7 +204,7 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
             </table>
             <div>
                 <p>Additional project notes:</p>
-                <textarea className={knitGrid.additionalProjectInfo}> </textarea>
+                <textarea className={knitGrid.additionalProjectInfo}/> 
                 <div className="flex">
                     <p> Highlight color: </p>
                     <input type="color" onChange={(event) => setSelectedHighlightColor(event.target.value)}></input>

@@ -1,0 +1,72 @@
+import {createSlice, PayloadAction} from '@reduxjs/toolkit';
+
+// Format of our knitting project information
+interface KnittingProjectState{
+    nameOfProject: string
+    stitches: number
+    needles: {
+        type: string
+        size: string
+    }
+    yarn: {
+        material: string
+        weight: string
+        yardage: string
+    }
+    progressGrid: string[][]
+}
+
+const initialState: KnittingProjectState = {
+    nameOfProject: "",
+    stitches: 0,
+    needles: {
+        type: "",
+        size: ""
+    },
+    yarn: {
+        material: "",
+        weight: "",
+        yardage: ""
+    },
+        progressGrid: []
+}
+
+// Store the information
+const knittingProjectSlice = createSlice({
+    name: "knittingProject",
+    initialState,
+    reducers: {
+        setNameOfProject(state, action: PayloadAction<string>) {
+            state.nameOfProject = action.payload
+        },
+        setStitches(state, action: PayloadAction<number>) {
+            state.stitches = action.payload
+        },
+        setNeedleType(state, action: PayloadAction<string>) {
+            state.needles.type = action.payload
+        },
+        setNeedleSize(state, action: PayloadAction<string>) {
+            state.needles.size = action.payload
+        },
+        setYarnMaterial(state, action: PayloadAction<string>) {
+            state.yarn.material = action.payload
+        },
+        setYarnWeight(state, action: PayloadAction<string>) {
+            state.yarn.weight = action.payload
+        },
+        setYarnYardage(state, action: PayloadAction<string>) {
+            state.yarn.yardage = action.payload
+        },
+        setProgressGrid(state, action: PayloadAction<{stitchRow: number, col: number, stitchType: string}>) {
+            const {stitchRow, col, stitchType} = action.payload
+
+            state.progressGrid[stitchRow][col] = stitchType
+        },
+        reformatGrid(state, action: PayloadAction<string[][]>) {
+            state.progressGrid = action.payload
+        }
+    }
+})
+
+export const { setNameOfProject, setStitches, setNeedleType, setNeedleSize, setYarnMaterial, setYarnWeight, setYarnYardage, setProgressGrid, reformatGrid } = knittingProjectSlice.actions
+export default knittingProjectSlice.reducer
