@@ -107,7 +107,8 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
 
         if (startSelecting == true) {
             // We will create a key from the row + column
-            // since that creates a unique value for each stitch
+            // since that creates a unique value for each stitch.
+            // This also ensures we make a unique selection each time.
             const key = stitchRow.toString() + "," + column.toString()
 
             // Select the new stitches
@@ -117,13 +118,17 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                 return newlySelectedStitches
             })
 
-            const updateStitches = knittingProject.progressGrid[stitchRow][column].split(',')[0] + "," + color
+            if (selectedStitches.has(key)) {
+                
+                const updateStitches = knittingProject.progressGrid[stitchRow][column].split(',')[0] + "," + color
 
-            dispatch(setProgressGrid({stitchRow: stitchRow, col: column, stitchInfo: updateStitches}))
+                dispatch(setProgressGrid({stitchRow: stitchRow, col: column, stitchInfo: updateStitches}))
+            }
         }
            
     }
 
+    // Changes the color of the stitches
     function changeColorOfSelectedStitches(color: string) {
         selectedStitches.forEach(stitch => {
             const stitchRow = Number(stitch.split(',')[0])
@@ -134,8 +139,11 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
             setColor(color)
             
             dispatch(setProgressGrid({stitchRow: stitchRow, col: stitchCol, stitchInfo: stitchInfo}))
-
         })
+    }
+
+    // Undoes the action if user wants to restart a stitch or coloring of a stitch
+    function undo() {
 
     }
 
@@ -220,7 +228,6 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                                         // creating a new row. Skips the color since we do not want the name of the color in the entry
                                         const updatedArray = Array.from({ length: rowNumber + 1 }, (_, rowIndex) => Array.from( { length: stitches }, 
                                                 (_, colIndex) => knittingProject.progressGrid[rowIndex]?.[colIndex].split(',')[0] ?? ""));
-``
                                         dispatch(reformatGrid(updatedArray));
                                         //dispatch(reformatGrid(updatedArray))
 
