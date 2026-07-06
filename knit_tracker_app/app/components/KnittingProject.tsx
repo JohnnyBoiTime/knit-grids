@@ -252,12 +252,22 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                 </tbody>
             </table>
             <div>
-                <p>Additional project notes:</p>
+                <p>Project notes:</p>
                 <textarea className={knitGrid.additionalProjectInfo}/> 
                 <div className="flex">
                     <p> Highlight color: </p>
                     <input type="color" defaultValue={"#ffff00"} onChange={(event) => changeColorOfSelectedStitches(event.target.value)}></input>
                 </div>        
+                <div>
+                    { selectedStitches.size > 0 ? (
+                    <p>Press escape while clicked-into a stitch to cancel selected stitches. Click on the color box to change selected stitches color</p>
+                    ) : (
+                    <p>    
+                       No stitches selected. Click and drag to start selecting stitches    
+                    </p>
+                    )
+                    }
+                </div>
             </div>
         </div>
     )

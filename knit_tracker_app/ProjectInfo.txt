@@ -1,0 +1,7 @@
+WHAT TO DO/IDEAS:
+
+Add autofill feature: user can create an autofill string of length n, then fill n textboxes with that string everytime they press a button for example, it can be
+a string with no spaces like autofill = kpkpkpkpkpkpkpkp, then when they press enter it will be something like for (let i = 0; i < autofill.length; i++) and fill the 
+autofill.length amount of textboxes with the entries of autofill.
+
+Add an undo/redo.

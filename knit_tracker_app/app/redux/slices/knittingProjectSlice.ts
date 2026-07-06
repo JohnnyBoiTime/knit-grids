@@ -14,6 +14,7 @@ interface KnittingProjectState{
         yardage: string
     }
     progressGrid: string[][]
+    finished: boolean
 }
 
 const initialState: KnittingProjectState = {
@@ -28,7 +29,8 @@ const initialState: KnittingProjectState = {
         weight: "",
         yardage: ""
     },
-    progressGrid: []
+    progressGrid: [],
+    finished: false
 }
 
 // Store the information
@@ -66,10 +68,13 @@ const knittingProjectSlice = createSlice({
             state.progressGrid = action.payload
         },
         clearGrid(state) {
-            state.progressGrid= [["blank,#ffff00"]]
+            state.progressGrid = [["blank,#ffff00"]]
+        },
+        finishedProject(state, action: PayloadAction<boolean>) {
+            state.finished = action.payload
         }
     }
 })
 
-export const { setNameOfProject, setStitches, setNeedleType, setNeedleSize, setYarnMaterial, setYarnWeight, setYarnYardage, setProgressGrid, reformatGrid, clearGrid } = knittingProjectSlice.actions
+export const { setNameOfProject, setStitches, setNeedleType, setNeedleSize, setYarnMaterial, setYarnWeight, setYarnYardage, setProgressGrid, reformatGrid, clearGrid, finishedProject } = knittingProjectSlice.actions
 export default knittingProjectSlice.reducer
