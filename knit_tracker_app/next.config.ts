@@ -1,7 +1,23 @@
-import type { NextConfig } from "next";
+import {NextConfig} from 'next';
 
-const nextConfig: NextConfig = {
-  /* config options here */
+// Proxy setup
+const nextConfig: NextConfig = {  
+  async rewrites() {
+    return [
+      {
+        source: '/api/csrf',
+        destination: '/api/auth/csrf'
+      },
+     {
+       source: '/api/auth/:path*',
+       destination: '/api/auth/:path*',
+     },
+     {
+       source: '/api/:path*',
+       destination: `${process.env.NEXT_PUBLIC_DJANGO_API_ROUTE}/:path*`, 
+     },
+    ];
+  },
 };
 
 export default nextConfig;

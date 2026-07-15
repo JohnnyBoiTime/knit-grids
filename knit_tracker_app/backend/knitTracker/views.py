@@ -1,10 +1,12 @@
 from django.shortcuts import render
 from rest_framework import viewsets, permissions
+from rest_framework.views import APIView
 from .models import KnittingProject
 from .serializers import ProjectSerializer
 from django_ratelimit.decorators import ratelimit
 from django.views.decorators.http import require_GET
 from django.middleware.csrf import get_token, rotate_token
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib.auth import authenticate, login
 from django.http import JsonResponse
 from django.contrib.auth.models import User
@@ -12,7 +14,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 import json
 
 
-class KnittingProjectView(viewsets.ModelViewSet):
+class KnittingProjectView(APIView):
     serializer = ProjectSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -31,9 +33,9 @@ def user_projects(request):
     # Grab the users projects
     if request.method == 'GET':
         query_database_for_projects = (KnittingProject.objects
-                                       .select_related('name_of_project')
-                                       .filter(user=user)
-                                       )
+                                    .select_related('name_of_project')
+                                    .filter(user=user)
+                                    )
     
         # Send the users information about their projects to front end
         data = [
@@ -111,7 +113,7 @@ def user_projects(request):
 #########################################################
 
 # Set the csrf cookie
-# @ensure_csrf_cookie
+@ensure_csrf_cookie
 @require_GET # For session based CSRF
 def csrfTokenView(request):
     print("CSRF TOKEN!!!!")

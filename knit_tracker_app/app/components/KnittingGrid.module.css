@@ -82,3 +82,10 @@
 .toolsLayout {
     align-items: center;
 }
+
+.saveProjectButton {
+    border: 1px solid #ccc;
+    padding: 5px;
+    border-radius: 10px;
+    cursor: pointer
+ }

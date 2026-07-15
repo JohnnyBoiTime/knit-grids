@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import knitGrid from "./KnittingGrid.module.css"
 import {setNameOfProject, setStitches, setNeedleType, setNeedleSize, setYarnMaterial, setYarnWeight, setYarnYardage, setProgressGrid, reformatGrid, clearGrid} from "../redux/slices/knittingProjectSlice"
 import {useDispatch} from "react-redux"
@@ -8,6 +8,7 @@ import {AppDispatch } from "../redux/store";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import { current } from "@reduxjs/toolkit";
+import { useAddKnittingProjectMutation } from "../redux/slices/saveKnittingProjectSlice"
 
 type Stitches = string
 
@@ -30,6 +31,24 @@ interface yarn {
     yardage: number
 }
 
+// Format of project we 
+// send to the database
+type KnitProjectFormat = {
+    nameOfProject: string
+    stitches: number
+    needles: {
+    type: string
+    size: string
+    }
+    yarn: {
+        material: string
+        weight: string
+        yardage: string
+    }
+    progressGrid: string[][]
+    finished: boolean
+}
+
 // Begins the project. first row is the cast ons,
 // has second row to initialize the grid itself.
 function createKnitProject(stitches: number, rows: number): Stitches[][] {
@@ -43,6 +62,7 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
 
     // Before the states so we can set the default color to yellow
     const knittingProject = useSelector((state: RootState) => state.knittingProject)
+    const [addKnittingProject] = useAddKnittingProjectMutation()
 
     const [selectedStitches, setSelectedStitches] = useState<Set<string>>(new Set())
     const [selectedNeedles, setSelectedNeedless] = useState<needles>()
@@ -57,12 +77,6 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
 
     const dispatch = useDispatch<AppDispatch>();
 
-    interface User {
-        id: number
-        name: string
-        email: string
-    }
-
     useEffect(() => {
 
         // Create grid when starting a new project
@@ -74,7 +88,19 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
             dispatch(reformatGrid(startingArray))
         }
 
+        // Only render starting grid once
     }, [])
+
+    // Save a knitting project
+    const handleSavingKnittingProject = useCallback(async (savedProject: KnitProjectFormat) => {
+        try {
+
+            await addKnittingProject(savedProject).unwrap()
+
+        } catch (error) {
+            console.error("Could not save project!", error)
+        }
+    }, [addKnittingProject])
 
     // Updates the stitch at it's given row and column
     function updateIndividualStitch(stitchRow: number, stitchCol: number, stitchType: Stitches) {
@@ -345,6 +371,20 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                     onChange={(event) => setAutoFll(event.target.value)}>
 
                     </textarea>
+                </div>
+                <div>
+                    <button 
+                    className={knitGrid.saveProjectButton} 
+                    onClick={() => handleSavingKnittingProject({
+                        nameOfProject: knittingProject.yarn.material, 
+                        stitches: knittingProject.stitches,
+                        needles: knittingProject.needles,
+                        yarn: knittingProject.yarn,
+                        progressGrid: knittingProject.progressGrid,
+                        finished: knittingProject.finished
+                        })}> 
+                        Save project
+                    </button>
                 </div>
             </div>
             </div>

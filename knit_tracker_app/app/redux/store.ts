@@ -2,6 +2,7 @@ import {configureStore} from '@reduxjs/toolkit'
 import storage from 'redux-persist/lib/storage'
 import knittingProjectReducer from './slices/knittingProjectSlice'
 import {persistStore, persistReducer} from 'redux-persist'
+import { savedKnittingProjectsAPI } from './slices/saveKnittingProjectSlice'
 
 
 // Make sure on refreshes, we still have the knitting project
@@ -16,10 +17,12 @@ const persistKnittingProjectReducer = persistReducer(knittingProjectPersistConfi
 
 export const makeStore = configureStore({
     reducer: {
-        knittingProject: persistKnittingProjectReducer
+        knittingProject: persistKnittingProjectReducer,
+        [savedKnittingProjectsAPI.reducerPath]: savedKnittingProjectsAPI.reducer
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({serializableCheck: false})
+    .concat(savedKnittingProjectsAPI.middleware)
 })
 
 // Look for the knitting info under some set key to 

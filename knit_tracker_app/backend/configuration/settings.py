@@ -28,7 +28,22 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+CSRF_COOKIE_SECURE = False # Set to true in prod
+CSRF_COOKIE_SAMESITE = "Lax" # Set to none in prod
+SESSION_COOKIE_SAMESITE = "Lax" # set to none in prod
+SESSION_COOKIE_PATH = "/"
+CSRF_USE_SESSIONS = True 
+SESSION_COOKIE_SECURE = False # Set to true in prod
+
+# Other stuff
+SECURE_HSTS_SECONDS = 0
+#SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+#SECURE_HSTS_PRELOAD = True
+
+ALLOWED_HOSTS = [    
+    "localhost",
+    "127.0.0.1",
+]
 
 
 # Application definition
@@ -59,6 +74,13 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000"
 ]
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+]
+
+
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'configuration.urls'
 
