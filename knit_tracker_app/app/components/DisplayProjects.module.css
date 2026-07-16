@@ -1,0 +1,13 @@
+.displayedProjects {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+}
+
+.deleteButton {
+    cursor: pointer;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 3px;
+}

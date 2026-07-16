@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import knitGrid from "./KnittingGrid.module.css"
-import {setNameOfProject, setStitches, setNeedleType, setNeedleSize, setYarnMaterial, setYarnWeight, setYarnYardage, setProgressGrid, reformatGrid, clearGrid} from "../redux/slices/knittingProjectSlice"
+import {setNameOfProject, setStitches, setNeedleType, setNeedleSize, setYarnMaterial, setYarnWeight, setYarnYardage, setProgressGrid, reformatGrid, setNotes, clearGrid, setProjectID} from "../redux/slices/knittingProjectSlice"
 import {useDispatch} from "react-redux"
 import {AppDispatch } from "../redux/store";
 import { useSelector } from "react-redux";
@@ -65,8 +65,11 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
 
     // Before the states so we can set the default color to yellow
     const knittingProject = useSelector((state: RootState) => state.knittingProject)
+
+    // Mutation for adding a project
     const [addKnittingProject] = useAddKnittingProjectMutation()
-    const [projectId, setProjectID] = useState("")
+
+
     const [selectedStitches, setSelectedStitches] = useState<Set<string>>(new Set())
     const [projectNotes, setProjectNotes] = useState("")
     const [rowNotes, setRowNotes] = useState<string[]>([""])
@@ -110,7 +113,7 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
 
             const result = await addKnittingProject(savedProject).unwrap()
 
-            setProjectID(result.projectID)
+            dispatch(setProjectID(result.projectId))
 
         } catch (error) {
             console.error("Could not save project!", error)
@@ -363,7 +366,7 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                     marginTop: positionOfTools
                 }}>
                 <p>Project notes:</p>
-                <textarea className={knitGrid.additionalProjectInfo} value={projectNotes} onChange={(e) => setProjectNotes(e.target.value)}/> 
+                <textarea className={knitGrid.additionalProjectInfo} value={knittingProject.notes} onChange={(e) => dispatch(setNotes(e.target.value))}/> 
                 <div className="flex">
                     <p> Highlight color: </p>
                     <input type="color" defaultValue={"#ffff00"} onChange={(event) => changeColorOfSelectedStitches(event.target.value)}></input>
@@ -391,15 +394,15 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                     <button 
                     className={knitGrid.saveProjectButton} 
                     onClick={() => handleSavingKnittingProject({
-                        projectId: projectId,
-                        nameOfProject: "Boot", 
+                        projectId: knittingProject.projectID,
+                        nameOfProject: "Something Else", 
                         stitches: stitches,
                         needles: knittingProject.needles,
                         yarn: knittingProject.yarn,
                         progressGrid: knittingProject.progressGrid,
-                        notes: projectNotes,
+                        notes: knittingProject.notes,
                         rowNotes: rowNotes,
-                        finished: knittingProject.finished
+                        finished: false,
                         })}> 
                         Save project
                     </button>

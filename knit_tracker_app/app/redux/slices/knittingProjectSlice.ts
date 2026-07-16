@@ -2,6 +2,7 @@ import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 
 // Format of our knitting project information
 interface KnittingProjectState{
+    projectID: string
     nameOfProject: string
     stitches: number
     needles: {
@@ -20,6 +21,7 @@ interface KnittingProjectState{
 }
 
 const initialState: KnittingProjectState = {
+    projectID: "",
     nameOfProject: "",
     stitches: 0,
     needles: {
@@ -42,6 +44,9 @@ const knittingProjectSlice = createSlice({
     name: "knittingProject",
     initialState,
     reducers: {
+        setProjectID(state, action: PayloadAction<string>) {
+            state.projectID = action.payload
+        },
         setNameOfProject(state, action: PayloadAction<string>) {
             state.nameOfProject = action.payload
         },
@@ -63,6 +68,8 @@ const knittingProjectSlice = createSlice({
         setYarnYardage(state, action: PayloadAction<string>) {
             state.yarn.yardage = action.payload
         },
+
+        // Used to set specific attributes of the grid.
         setProgressGrid(state, action: PayloadAction<{stitchRow: number, col: number, stitchInfo: string}>) {
             const {stitchRow, col, stitchInfo} = action.payload
 
@@ -74,6 +81,9 @@ const knittingProjectSlice = createSlice({
         setRowNotes(state, action: PayloadAction<string[]>) {
             state.rowNotes = action.payload
         },
+
+        // This is different from setProgressGrid. Used to set/reformat the entire grid.
+        // So, when retrieving information from the database, this is used.
         reformatGrid(state, action: PayloadAction<string[][]>) {
             state.progressGrid = action.payload
         },
@@ -86,5 +96,5 @@ const knittingProjectSlice = createSlice({
     }
 })
 
-export const { setNameOfProject, setStitches, setNeedleType, setNeedleSize, setYarnMaterial, setYarnWeight, setYarnYardage, setProgressGrid, setNotes, setRowNotes, reformatGrid, clearGrid, finishedProject } = knittingProjectSlice.actions
+export const { setNameOfProject, setStitches, setNeedleType, setNeedleSize, setYarnMaterial, setYarnWeight, setYarnYardage, setProgressGrid, setNotes, setRowNotes, reformatGrid, clearGrid, finishedProject, setProjectID } = knittingProjectSlice.actions
 export default knittingProjectSlice.reducer

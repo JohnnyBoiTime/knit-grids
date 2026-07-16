@@ -62,7 +62,7 @@ def user_projects(request):
         
         data = json.loads(request.body)
         print(data)
-        projectID = data.get("projectId")
+        projectId = data.get("projectId")
         nameOfProject = data.get("nameOfProject")
         stitches = data.get("stitches")
         needles = data.get("needles")
@@ -76,7 +76,7 @@ def user_projects(request):
         # projects name. If it exists, update it with the new user informations
         projects, created = KnittingProject.objects.update_or_create(
             user=user,
-            project_id=projectID,
+            project_id=projectId,
             # New entry 
             defaults = {
                 "name_of_project": nameOfProject,
@@ -94,7 +94,7 @@ def user_projects(request):
         # we can use the updated at and created at stuff
         return JsonResponse(
             {
-                "projectID": projects.project_id,
+                "projectId": projects.project_id,
                 "nameOfProject":  projects.name_of_project,
                 "stitches": projects.stitches,
                 "needles": projects.needles,
@@ -109,6 +109,24 @@ def user_projects(request):
             },
             encoder=DjangoJSONEncoder # updatedAt and createdAt are dateTime, so this helps convert them into the json
         )
+
+    # Delete users project
+    if request.method == 'DELETE':
+        data = json.loads(request.body)
+
+        projectId = data.get("projectId")
+
+        knittingProject = (
+                            KnittingProject.objects.get(user=user, project_id=projectId)
+                            )
+        
+        nameOfKnitProject = knittingProject.name_of_project
+
+        knittingProject.delete()
+
+        return JsonResponse({
+            "message": f"Project {nameOfKnitProject} was deleted"
+        }, status=200 )
 
 #########################################################
 # CSRF AND USER AUTHENTICATION/LOGIN/REGISTRATION VIEWS #

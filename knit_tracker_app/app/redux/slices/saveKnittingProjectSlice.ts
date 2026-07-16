@@ -20,16 +20,32 @@ type KnitProjectFormat = {
 
 // Used to display info on saved projects page,
 // to provide an overview of the project on the
-// "View Projects" page
+// "View Projects" page, as well as 
+// to display selected projects information
+// in the main project page
 type KnitProjectInfo = {
-    projectID: string
+    projectId: string
     nameOfProject: string
     stitches: number
-    needleType: string
-    yarnMaterial: string
-    completed: boolean
+    needles: {
+    type: string
+    size: string
+    }
+    yarn: {
+        material: string
+        weight: string
+        yardage: string
+    }
+    progressGrid: string[][]
+    notes: string
+    rowNotes: string[]
+    finished: boolean
     createdAt: string
     updatedAt: string
+}
+
+type DeleteKnitProject = {
+    message: string
 }
 
 // Grab the csrf token for the users session
@@ -56,16 +72,19 @@ export const savedKnittingProjectsAPI = createApi({
     tagTypes: ['KnittingProjects'],
     endpoints: (builder) => {
         return {
+
+            // Grab all of the users projects
             getSavedKnittingProjects: builder.query<KnitProjectInfo[], void> ({
                 query: () => ({
                     url: "/userProjects/"
                 }),
                 providesTags: (result) => 
                     result 
-                    ?  ['KnittingProjects', ...result.map((res: KnitProjectInfo) => ({type: 'KnittingProjects' as const, id: res.projectID}))]
-                    : ['KnittingProjects']
+                    ?  ['KnittingProjects', ...result.map((res: KnitProjectInfo) => ({type: 'KnittingProjects' as const, id: res.projectId}))]
+                    : ['KnittingProjects'],
             }),
 
+            // Adding a project
             addKnittingProject: builder.mutation<KnitProjectInfo, KnitProjectFormat>({
                 async queryFn(knitProject, queryAPI, extraOptions, baseQuery) {
                     try {
@@ -101,18 +120,62 @@ export const savedKnittingProjectsAPI = createApi({
                             }
                         }
                     }
-                   
                 },
 
                 // When saving a knitting project,
                 // we dont need to cache it since we just saved it,
                 // so we assume we dont wanna save the same thing again
                 invalidatesTags: ['KnittingProjects']
+            }),
+            
+            // Delete a knitting project
+            deleteKnittingProject: builder.mutation<string, string>({
+                 async queryFn(projectId, queryAPI, extraOptions, baseQuery) {
+                    try {
+                        // Make the request
+                        const csrfToken = await getCsrfToken()
+                        const res = await baseQuery({
+                            url: "/userProjects/",
+                            method: "DELETE",
+                            body: {
+                                projectId: projectId
+                            },
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': csrfToken,
+                            },
+                        })
+
+                        // See if we get any errors from the backend when
+                        // retrieving.
+                        // List of errors: https://redux-toolkit.js.org/rtk-query/api/fetchBaseQuery
+                        if ('error' in res) {
+                            return {error: res.error as FetchBaseQueryError}
+                        }
+
+                        const response = res.data as DeleteKnitProject
+
+                        // Got our data!
+                        return { data: response.message}
+
+                    // We caught something bad during runtime :(
+                    } catch (error) {
+                        return {
+                            error: {
+                                status: 'CUSTOM_ERROR',
+                                error: error instanceof Error ? error.message : "Unknown error!"
+                            }
+                        }
+                    }
+                },
+
+                // Fetch cache data again after delete
+                invalidatesTags: ["KnittingProjects"]
             })
         }
     }
 })
 
-export const {useGetSavedKnittingProjectsQuery, useAddKnittingProjectMutation} = savedKnittingProjectsAPI
+export const {useGetSavedKnittingProjectsQuery, useAddKnittingProjectMutation, useDeleteKnittingProjectMutation} = savedKnittingProjectsAPI
 
 
