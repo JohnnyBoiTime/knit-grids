@@ -13,6 +13,8 @@ interface KnittingProjectState{
         weight: string
         yardage: string
     }
+    notes: string
+    rowNotes: string[]
     progressGrid: string[][]
     finished: boolean
 }
@@ -29,6 +31,8 @@ const initialState: KnittingProjectState = {
         weight: "",
         yardage: ""
     },
+    notes: "",
+    rowNotes: [],
     progressGrid: [],
     finished: false
 }
@@ -64,6 +68,12 @@ const knittingProjectSlice = createSlice({
 
             state.progressGrid[stitchRow][col] = stitchInfo
         },
+        setNotes(state, action: PayloadAction<string>) {
+            state.notes = action.payload
+        },
+        setRowNotes(state, action: PayloadAction<string[]>) {
+            state.rowNotes = action.payload
+        },
         reformatGrid(state, action: PayloadAction<string[][]>) {
             state.progressGrid = action.payload
         },
@@ -76,5 +86,5 @@ const knittingProjectSlice = createSlice({
     }
 })
 
-export const { setNameOfProject, setStitches, setNeedleType, setNeedleSize, setYarnMaterial, setYarnWeight, setYarnYardage, setProgressGrid, reformatGrid, clearGrid, finishedProject } = knittingProjectSlice.actions
+export const { setNameOfProject, setStitches, setNeedleType, setNeedleSize, setYarnMaterial, setYarnWeight, setYarnYardage, setProgressGrid, setNotes, setRowNotes, reformatGrid, clearGrid, finishedProject } = knittingProjectSlice.actions
 export default knittingProjectSlice.reducer

@@ -1,0 +1,22 @@
+.pageFormat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.loginPageTitle {
+    font-weight: bold;
+}
+
+.loginCard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.formFormat {
+    display: flex;
+    flex-direction: column;
+}

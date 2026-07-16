@@ -88,7 +88,7 @@ export const savedKnittingProjectsAPI = createApi({
                         if ('error' in res) {
                             return {error: res.error as FetchBaseQueryError}
                         }
-                        
+
                         // Got our data!
                         return { data: res.data as KnitProjectInfo}
 

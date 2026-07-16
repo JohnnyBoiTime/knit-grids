@@ -33,7 +33,6 @@ def user_projects(request):
     # Grab the users projects
     if request.method == 'GET':
         query_database_for_projects = (KnittingProject.objects
-                                    .select_related('name_of_project')
                                     .filter(user=user)
                                     )
     
@@ -62,22 +61,25 @@ def user_projects(request):
     if request.method == 'POST':
         
         data = json.loads(request.body)
-        nameOfProject = data.get("nameOfProject"),
-        stitches = data.get("stitches"),
-        needles = data.get("needles"),
-        yarn = data.get("yarn"),
-        progressGrid = data.get("progressGrid"),
-        notes = data.get("notes"),
-        rowNotes = data.get("rownotes"),
-        completed = data.get("completed"),
+        print(data)
+        projectID = data.get("projectId")
+        nameOfProject = data.get("nameOfProject")
+        stitches = data.get("stitches")
+        needles = data.get("needles")
+        yarn = data.get("yarn")
+        progressGrid = data.get("progressGrid")
+        notes = data.get("notes") or ""
+        rowNotes = data.get("rowNotes") or ""
+        completed = data.get("finished")
 
         # Checks if user already has that project in the database based on the 
         # projects name. If it exists, update it with the new user informations
         projects, created = KnittingProject.objects.update_or_create(
             user=user,
-            name_of_project=nameOfProject,
+            project_id=projectID,
             # New entry 
             defaults = {
+                "name_of_project": nameOfProject,
                 "stitches": stitches, 
                 "needles": needles, 
                 "yarn": yarn, 
@@ -124,7 +126,7 @@ def csrfTokenView(request):
 # Login the user and send the users csrf token for verifications
 def user_login(request):
     
-    data = json.loads()
+    data = json.loads(request.body)
 
     user = authenticate(request, username = data.get("username"), password = data.get("password"))
 
@@ -148,7 +150,7 @@ def user_login(request):
 @ratelimit(key='ip', rate='3/h', block=False)
 def register_user(request):
 
-    data = json.load(request.body)
+    data = json.loads(request.body)
     username = data.get("username")
     email = data.get("email") # email is used only for resetting password
     password = data.get("password")

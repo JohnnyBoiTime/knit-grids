@@ -34,6 +34,7 @@ interface yarn {
 // Format of project we 
 // send to the database
 type KnitProjectFormat = {
+    projectId: string
     nameOfProject: string
     stitches: number
     needles: {
@@ -45,6 +46,8 @@ type KnitProjectFormat = {
         weight: string
         yardage: string
     }
+    notes: string
+    rowNotes: string[]
     progressGrid: string[][]
     finished: boolean
 }
@@ -63,16 +66,15 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
     // Before the states so we can set the default color to yellow
     const knittingProject = useSelector((state: RootState) => state.knittingProject)
     const [addKnittingProject] = useAddKnittingProjectMutation()
-
+    const [projectId, setProjectID] = useState("")
     const [selectedStitches, setSelectedStitches] = useState<Set<string>>(new Set())
-    const [selectedNeedles, setSelectedNeedless] = useState<needles>()
+    const [projectNotes, setProjectNotes] = useState("")
+    const [rowNotes, setRowNotes] = useState<string[]>([""])
     const [currentPosition, setCurrentPosition] = useState<string>(`${stitches},20`)
-    const [selectedYarn, setSelectedYarn] = useState<yarn>()
     const [color, setColor] = useState<string>("yellow")
     const [positionOfTools, setPositionOfTools] = useState(1)
     const [autoFill, setAutoFll] = useState("")
     const [startSelecting, setStartSelecting] = useState<boolean>(false)
-    const [knittingGrid, setKnittingGrid] = useState<Stitches[][]>(() => createKnitProject(stitches, 20)) // Creates the grid
     const [projectName, setProjectName] = useState<string>(() => nameOfProject) // Change project name
 
     const dispatch = useDispatch<AppDispatch>();
@@ -91,11 +93,24 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
         // Only render starting grid once
     }, [])
 
+    // Make sure to store all of the users row notes here
+    function updateRowNotes(row: number, note: string) {
+
+        // Update prev notes with new ones
+        setRowNotes((prevNotes) => {
+            const updateNotes = [...prevNotes]
+            updateNotes[row] = note
+            return updateNotes
+        })
+    }
+
     // Save a knitting project
     const handleSavingKnittingProject = useCallback(async (savedProject: KnitProjectFormat) => {
         try {
 
-            await addKnittingProject(savedProject).unwrap()
+            const result = await addKnittingProject(savedProject).unwrap()
+
+            setProjectID(result.projectID)
 
         } catch (error) {
             console.error("Could not save project!", error)
@@ -336,7 +351,7 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                             </td>
                             ))}
                         <td>
-                            <input className={knitGrid.additionalRowInfo}/>
+                            <input className={knitGrid.additionalRowInfo} value={rowNotes[rowNumber - 1] ?? ""} onChange={(e) => updateRowNotes(rowNumber - 1, e.target.value)} />
                         </td>
                         </tr>
                     )
@@ -348,7 +363,7 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                     marginTop: positionOfTools
                 }}>
                 <p>Project notes:</p>
-                <textarea className={knitGrid.additionalProjectInfo}/> 
+                <textarea className={knitGrid.additionalProjectInfo} value={projectNotes} onChange={(e) => setProjectNotes(e.target.value)}/> 
                 <div className="flex">
                     <p> Highlight color: </p>
                     <input type="color" defaultValue={"#ffff00"} onChange={(event) => changeColorOfSelectedStitches(event.target.value)}></input>
@@ -376,11 +391,14 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                     <button 
                     className={knitGrid.saveProjectButton} 
                     onClick={() => handleSavingKnittingProject({
-                        nameOfProject: knittingProject.yarn.material, 
-                        stitches: knittingProject.stitches,
+                        projectId: projectId,
+                        nameOfProject: "Boot", 
+                        stitches: stitches,
                         needles: knittingProject.needles,
                         yarn: knittingProject.yarn,
                         progressGrid: knittingProject.progressGrid,
+                        notes: projectNotes,
+                        rowNotes: rowNotes,
                         finished: knittingProject.finished
                         })}> 
                         Save project
