@@ -85,9 +85,9 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
     useEffect(() => {
 
         // Create grid when starting a new project
-        if (knittingProject.progressGrid.length === 0) {
+        if (knittingProject.projectID === "Blank") {
 
-            const startingArray = Array.from({length: 20}, 
+            const startingArray = Array.from({length: 1}, 
                 () => Array.from({length: stitches}, () => ",")
             )
             dispatch(reformatGrid(startingArray))
@@ -110,6 +110,9 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
     // Save a knitting project
     const handleSavingKnittingProject = useCallback(async (savedProject: KnitProjectFormat) => {
         try {
+
+
+            console.log(savedProject)
 
             const result = await addKnittingProject(savedProject).unwrap()
 
@@ -395,7 +398,7 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                     className={knitGrid.saveProjectButton} 
                     onClick={() => handleSavingKnittingProject({
                         projectId: knittingProject.projectID,
-                        nameOfProject: "Something Else", 
+                        nameOfProject: nameOfProject, 
                         stitches: stitches,
                         needles: knittingProject.needles,
                         yarn: knittingProject.yarn,

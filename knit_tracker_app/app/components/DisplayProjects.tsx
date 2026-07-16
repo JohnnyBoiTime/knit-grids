@@ -5,8 +5,8 @@ import displayProjectStyles from './DisplayProjects.module.css'
 import{ useDeleteKnittingProjectMutation, useGetSavedKnittingProjectsQuery } from '../redux/slices/saveKnittingProjectSlice'
 import {useDispatch} from "react-redux"
 import {AppDispatch } from "../redux/store";
-import { RootState } from "../redux/store";
-import { setNameOfProject, setStitches, setNeedleType, setNeedleSize, setYarnMaterial, setYarnWeight, setYarnYardage, setProjectID, reformatGrid, clearGrid, setNotes, setRowNotes, finishedProject  } from '../redux/slices/knittingProjectSlice'
+import {useRouter} from "next/navigation"
+import { setNameOfProject, setStitches, setNeedleType, setNeedleSize, setYarnMaterial, setYarnWeight, setYarnYardage, setProjectID, reformatGrid, clearGrid, setNotes, setRowNotes, finishedProject, setProgressGrid  } from '../redux/slices/knittingProjectSlice'
 import Link from 'next/link'
 import KnittingProject from './KnittingProject';
 
@@ -37,6 +37,11 @@ export default function DisplayProjects() {
 
     const dispatch = useDispatch<AppDispatch>();
 
+    const router = useRouter()
+
+    const [projectStitches, setProjectSitches] = useState("")
+    const [projectName, setProjectName] = useState("") 
+
     // Does the user actually have saved projects?
     const projects = data ? data : []
 
@@ -57,6 +62,26 @@ export default function DisplayProjects() {
         console.log(knittingProject)
     }
 
+    function createNewProject(e: React.FormEvent) {
+        e.preventDefault()
+
+        const progressGrid = {}
+
+        dispatch(setProjectID("Blank"))
+        dispatch(setNameOfProject(projectName))
+        dispatch(setStitches(Number(projectStitches)))
+        dispatch(setNeedleType(""))
+        dispatch(setNeedleSize(""))
+        dispatch(setYarnMaterial(""))
+        dispatch(setYarnWeight(""))
+        dispatch(setYarnYardage(""))
+        dispatch(setNotes(""))
+        dispatch(setRowNotes([]))
+        dispatch(finishedProject(false))
+
+        router.replace("/project-page")
+    }
+
     const handeDeletingProject = useCallback(async (knittingProjectId: string, knittingProjectName: string) => {
         try {
 
@@ -74,7 +99,6 @@ export default function DisplayProjects() {
         }
     }, [deleteProject])
 
-
     return (
         <div>
             <div>
@@ -91,14 +115,41 @@ export default function DisplayProjects() {
                                 {project.nameOfProject}
                             </Link>
                             <button 
-                            className={displayProjectStyles.deleteButton}
-                            onClick={() => handeDeletingProject(project.projectId, project.nameOfProject)}>
+                                className={displayProjectStyles.deleteButton}
+                                onClick={() => handeDeletingProject(project.projectId, project.nameOfProject)}>
                                 Delete project
                             </button>
                         </div>
                     </li>
                 ))}
             </ul>
+            <div>
+                Create a new project!
+                <form onSubmit={createNewProject}>
+                    <div>
+                        <input
+                        className="w-55" 
+                        type="number"
+                        placeholder="Stitch count"
+                        value={projectStitches}
+                        onChange={e => setProjectSitches(e.target.value)}
+                        required/>
+
+                        <input
+                        className="w-55" 
+                        type="text"
+                        placeholder="Name of Project"
+                        value={projectName}
+                        onChange={e => setProjectName((e.target.value))}
+                        required/>
+                    </div>
+                    <div>
+                        <button type="submit">
+                            Create Project
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     )
 }

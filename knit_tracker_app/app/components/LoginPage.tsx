@@ -42,16 +42,13 @@ const LoginPage = () => {
         try {
             await loginUser({username, password})
 
-            router.replace("/project-page")
+            router.replace("/saved-projects")
 
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
                 setErrorMessage(error.message)
             }
         }
-
-        
-
     }
 
   return (

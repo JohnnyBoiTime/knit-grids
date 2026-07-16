@@ -63,32 +63,37 @@ def user_projects(request):
         data = json.loads(request.body)
         print(data)
         projectId = data.get("projectId")
-        nameOfProject = data.get("nameOfProject")
-        stitches = data.get("stitches")
-        needles = data.get("needles")
-        yarn = data.get("yarn")
-        progressGrid = data.get("progressGrid")
-        notes = data.get("notes") or ""
-        rowNotes = data.get("rowNotes") or ""
-        completed = data.get("finished")
 
-        # Checks if user already has that project in the database based on the 
-        # projects name. If it exists, update it with the new user informations
-        projects, created = KnittingProject.objects.update_or_create(
-            user=user,
-            project_id=projectId,
-            # New entry 
-            defaults = {
-                "name_of_project": nameOfProject,
-                "stitches": stitches, 
-                "needles": needles, 
-                "yarn": yarn, 
-                "progress_grid": progressGrid, 
-                "notes": notes,
-                "row_notes": rowNotes,
-                "completed": completed,
-            }
-        )
+        defaults = {
+            "name_of_project": data.get("nameOfProject"),
+            "stitches": data.get("stitches"),
+            "needles": data.get("needles"),
+            "yarn": data.get("yarn"),
+            "progress_grid": data.get("progressGrid"),
+            "notes": data.get("notes") or "",
+            "row_notes": data.get("rowNotes") or [],
+            "completed": data.get("finished"),
+        }
+
+        # If statement is here because since it is altered with the project id,
+        # creating a new project will have no id, therefore we have to create a new 
+        # project using the defaults since django creates the id automatically.
+        if projectId != "Blank":
+            # Checks if user already has that project in the database based on the 
+            # projects name. If it exists, update it with the new user information
+            projects, created = KnittingProject.objects.update_or_create(
+                user=user,
+                project_id=projectId,
+                # New entry 
+                defaults = defaults
+            )
+        else:
+               # Checks if user already has that project in the database based on the 
+            # projects name. If it exists, update it with the new user informations
+            projects = KnittingProject.objects.create(
+                user=user,
+                **defaults,
+            )
     
         # Get the information from the database back after insertion so 
         # we can use the updated at and created at stuff
@@ -105,7 +110,6 @@ def user_projects(request):
                 "completed": projects.completed,
                 "updatedAt": projects.updated_at,
                 "createdAt": projects.created_at,
-                "isCreated": created, # Might be useful to know if the project already exists for parsing
             },
             encoder=DjangoJSONEncoder # updatedAt and createdAt are dateTime, so this helps convert them into the json
         )
