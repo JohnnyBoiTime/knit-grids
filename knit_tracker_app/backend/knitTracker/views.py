@@ -88,8 +88,7 @@ def user_projects(request):
                 defaults = defaults
             )
         else:
-               # Checks if user already has that project in the database based on the 
-            # projects name. If it exists, update it with the new user informations
+            # There is no project id, therefore we have a new project to add to the database 
             projects = KnittingProject.objects.create(
                 user=user,
                 **defaults,

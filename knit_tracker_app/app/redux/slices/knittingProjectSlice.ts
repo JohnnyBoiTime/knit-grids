@@ -39,7 +39,7 @@ const initialState: KnittingProjectState = {
     finished: false
 }
 
-// Store the information
+// Changing the state
 const knittingProjectSlice = createSlice({
     name: "knittingProject",
     initialState,
