@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import knitGrid from "./KnittingGrid.module.css"
 import {setNameOfProject, setStitches, setNeedleType, setNeedleSize, setYarnMaterial, setYarnWeight, setYarnYardage, setProgressGrid, reformatGrid, setNotes, clearGrid, setProjectID} from "../redux/slices/knittingProjectSlice"
 import {useDispatch} from "react-redux"
@@ -81,6 +81,25 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
     const [projectName, setProjectName] = useState<string>(() => nameOfProject) // Change project name
 
     const dispatch = useDispatch<AppDispatch>();
+
+    // Stores ref to every HTML element, this is so 
+    //  the cursor is moved around the inputs when doing
+    // things like autofill. The coordinates of the 
+    // input is mapped to itself, this is so
+    // we can store refs to the inputs
+    const inputRefs = useRef<Record<string, HTMLInputElement | null>>({});
+
+    // Finds the stitch to focus on and moves
+    // the cursor there.
+    function moveCursor(row: number, col: number) {
+        const key = `${row},${col}`
+        const input = inputRefs.current[key]
+
+        // Focus on the selected input
+        if (input) {
+            input.focus()
+        }
+    }
 
     useEffect(() => {
 
@@ -183,9 +202,15 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
         }
     }
 
+    // Autofills the stitches from the starting row and column.
+    // Does it character by character in the inputted string.
     function autofill(startingRow: number, startingCol: number) {
 
-            const lengthOfAutofill = autoFill.length
+            // Split the string via whitespace so
+            // you can have mult-character stitches
+            // like BRK
+            const fillText: string[] = autoFill.split(" ")
+            const lengthOfAutofill = fillText.length
 
             let stringIndex = 0
 
@@ -200,13 +225,11 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
             // Update the array with the auto fill!
             const updatedArray = Array.from({ length: knittingProject.progressGrid.length + additionalRows}, (_, rowIndex) => Array.from( { length: stitches }, 
                         (_, colIndex) => 
-                            { 
-                                
+                            {   
                                 // Start filling when we get to the designated coordinate
                                 if (rowIndex == startingRow - 1 && colIndex == startingCol) {
                                     
                                     beginFilling = true
-                                    
                                 }
 
                                 // We now start filling
@@ -214,7 +237,7 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
 
                                     const oldGrid = knittingProject.progressGrid[rowIndex]?.[colIndex] ?? "" 
                                 
-                                    const newStitch = autoFill[stringIndex] + ',' + color
+                                    let newStitch = fillText[stringIndex] + ',' + color
 
                                     const key = rowIndex.toString() + "," + colIndex.toString()
 
@@ -227,15 +250,25 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
 
                                     stringIndex++
                                     
+
                                     return newStitch ?? oldGrid
                                 }
+                                
                                 else {
                                     return knittingProject.progressGrid[rowIndex]?.[colIndex] ?? ""
                                 }
 
                         }))
                         
-                        
+                        // Makes it so the tools area goes to where the project
+                        // currently is/ the last row.
+                        const newPosition = updatedArray.length * 23
+                        setPositionOfTools(newPosition)
+
+                        // Move the cursor there too
+                        moveCursor(startingRow - 1, startingCol + lengthOfAutofill - 1)
+
+
                         dispatch(reformatGrid(updatedArray))
         
     }
@@ -313,7 +346,7 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                                 }
 
                                 // Autofill feature!
-                                if (event.key.toLowerCase() === "f") {
+                                if (event.key === "Tab") {
                                     autofill(rowNumber, colIndex)
                                 }
                                 
@@ -369,6 +402,10 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                             }}
                             onMouseMove={() => selectMultipleStitches(rowNumber - 1, colIndex)}>
                                 <input 
+                                ref={(element) => {
+                                    // Grab the inputs ref to store in record
+                                    inputRefs.current[`${rowNumber - 1},${colIndex}`] = element;
+                                }}
                                     className={knitGrid.stitchInput}
                                     style={{
                                         color: knittingProject.progressGrid[rowNumber - 1][colIndex].split(',')[2] === '1' ? 'black' : 'white'
@@ -408,7 +445,7 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                 </div>
                 <div>
                     <p>
-                        Stitch autocomplete (NOTE* will also autocompleete with highlight color):
+                        (Tab) Stitch autocomplete (NOTE* will also autocomplete with highlight color, stitches are separated by space):
                     </p>
                     <textarea
                     onChange={(event) => setAutoFll(event.target.value)}>
