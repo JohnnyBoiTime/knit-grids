@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import knitGrid from "./KnittingGrid.module.css"
-import {setNameOfProject, setStitches, setNeedleType, setNeedleSize, setYarnMaterial, setYarnWeight, setYarnYardage, setProgressGrid, reformatGrid, setNotes, clearGrid, setProjectID} from "../redux/slices/knittingProjectSlice"
+import {setNameOfProject, setStitches, setNeedleType, setNeedleSize, setYarnMaterial, setYarnWeight, setYarnYardage, setProgressGrid, setProgressGridColors, reformatGrid, setNotes, clearGrid, setProjectID} from "../redux/slices/knittingProjectSlice"
 import {useDispatch} from "react-redux"
 import {AppDispatch } from "../redux/store";
 import { useSelector } from "react-redux";
@@ -273,8 +273,34 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
         
     }
 
-    // Changes the color of the stitches
+    // Changes the color of the stitches.
     function changeColorOfSelectedStitches(color: string) {
+
+        // This makes the changes altogether, then we dispatch it in bulk
+        // to the slice for one big change, so we are not individually
+        // changing each state. Makes it more efficient!
+        const updateColors = Array.from(selectedStitches, (stitch) => {
+            
+            // Grab the row and column
+            const [row, column] = stitch.split(",")
+
+            const stitchRow = Number(row)
+            const stitchCol = Number(column)
+
+            const currentCell = knittingProject.progressGrid[stitchRow][stitchCol]
+
+            // Grab the text from the stitch
+            const stitchVal = currentCell.split(",")[0]
+
+            return {
+                stitchRow,
+                stitchCol,
+                stitchInfo: `${stitchVal},${color}`
+            }
+
+        })
+        
+        /*
         selectedStitches.forEach(stitch => {
             const stitchRow = Number(stitch.split(',')[0])
             const stitchCol = Number(stitch.split(',')[1])
@@ -282,11 +308,13 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
 
             // Just changing the color, so keep the old value
             const stitchInfo = knittingProject.progressGrid[stitchRow][stitchCol].split(',')[0] + "," + color
+        })
+
+        */
+
             setColor(color)
             
-            
-            dispatch(setProgressGrid({stitchRow: stitchRow, col: stitchCol, stitchInfo: stitchInfo}))
-        })
+            dispatch(setProgressGridColors(updateColors))
     }
 
     // Undoes the action if user wants to restart a stitch or coloring of a stitch

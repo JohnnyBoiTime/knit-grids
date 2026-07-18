@@ -75,6 +75,11 @@ const knittingProjectSlice = createSlice({
 
             state.progressGrid[stitchRow][col] = stitchInfo
         },
+        setProgressGridColors(state, action: PayloadAction<{stitchRow: number, stitchCol: number, stitchInfo: string}[]>) {
+            action.payload.forEach((stitch) => {
+                state.progressGrid[stitch.stitchRow][stitch.stitchCol] = stitch.stitchInfo
+            })
+        },
         setNotes(state, action: PayloadAction<string>) {
             state.notes = action.payload
         },
@@ -96,5 +101,5 @@ const knittingProjectSlice = createSlice({
     }
 })
 
-export const { setNameOfProject, setStitches, setNeedleType, setNeedleSize, setYarnMaterial, setYarnWeight, setYarnYardage, setProgressGrid, setNotes, setRowNotes, reformatGrid, clearGrid, finishedProject, setProjectID } = knittingProjectSlice.actions
+export const { setNameOfProject, setStitches, setNeedleType, setNeedleSize, setYarnMaterial, setYarnWeight, setYarnYardage, setProgressGrid, setNotes, setRowNotes, reformatGrid, clearGrid, finishedProject, setProjectID, setProgressGridColors } = knittingProjectSlice.actions
 export default knittingProjectSlice.reducer
