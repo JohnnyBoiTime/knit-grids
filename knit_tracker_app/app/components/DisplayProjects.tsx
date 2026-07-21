@@ -31,6 +31,7 @@ type UserSelectedProject = {
 
 export default function DisplayProjects() {
 
+    // Retrieve all of the users projects
     const { data } = useGetSavedKnittingProjectsQuery()
 
     const [deleteProject] = useDeleteKnittingProjectMutation()
@@ -82,7 +83,8 @@ export default function DisplayProjects() {
         router.replace("/project-page")
     }
 
-    const handeDeletingProject = useCallback(async (knittingProjectId: string, knittingProjectName: string) => {
+    // Delete the project from saved projects
+    const handeDeletingProject = async (knittingProjectId: string, knittingProjectName: string) => {
         try {
 
             const confirmation = confirm(`Are you sure you want to delete ${knittingProjectName}? This action cannot be undone`)
@@ -97,7 +99,7 @@ export default function DisplayProjects() {
         } catch (error) {
             console.error("Could not save project!", error)
         }
-    }, [deleteProject])
+    }
 
     return (
         <div>

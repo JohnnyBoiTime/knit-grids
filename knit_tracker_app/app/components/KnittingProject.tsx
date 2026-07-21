@@ -9,6 +9,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import { current } from "@reduxjs/toolkit";
 import { useAddKnittingProjectMutation } from "../redux/slices/saveKnittingProjectSlice"
+import { CheckCheckIcon, CheckCircleIcon, CheckIcon, SaveCheck } from "lucide-react";
 
 type Stitches = string
 
@@ -66,15 +67,16 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
     // Before the states so we can set the default color to yellow
     const knittingProject = useSelector((state: RootState) => state.knittingProject)
 
-    // Mutation for adding a project
-    const [addKnittingProject] = useAddKnittingProjectMutation()
+    // Mutation for saving a project
+    const [addKnittingProject , {isLoading: isSaving}] = useAddKnittingProjectMutation()
 
 
     const [selectedStitches, setSelectedStitches] = useState<Set<string>>(new Set())
+    const [toggleAutofill, setToggleAutofill] = useState(false)
     const [projectNotes, setProjectNotes] = useState("")
-    const [rowNotes, setRowNotes] = useState<string[]>([""])
+    const [rowNotes, setRowNotes] = useState([""])
     const [currentPosition, setCurrentPosition] = useState<string>(`${stitches},20`)
-    const [color, setColor] = useState<string>("yellow")
+    const [color, setColor] = useState("yellow")
     const [positionOfTools, setPositionOfTools] = useState(1)
     const [autoFill, setAutoFll] = useState("")
     const [startSelecting, setStartSelecting] = useState<boolean>(false)
@@ -126,8 +128,22 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
         })
     }
 
+    // Toggles autofill for the grid
+    function autofillToggle() {
+
+        // If autofill is on, turn it off
+        if (toggleAutofill == true) {
+            setToggleAutofill(false)
+        }
+
+        // If autofill is off, turn it on
+        else {
+            setToggleAutofill(true)
+        }
+    }
+
     // Save a knitting project
-    const handleSavingKnittingProject = useCallback(async (savedProject: KnitProjectFormat) => {
+    const handleSavingKnittingProject = async (savedProject: KnitProjectFormat) => {
         try {
 
 
@@ -140,7 +156,7 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
         } catch (error) {
             console.error("Could not save project!", error)
         }
-    }, [addKnittingProject])
+    }
 
     // Updates the stitch at it's given row and column
     function updateIndividualStitch(stitchRow: number, stitchCol: number, stitchType: Stitches) {
@@ -374,7 +390,7 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                                 }
 
                                 // Autofill feature!
-                                if (event.key === "Tab") {
+                                if (event.key === "Tab" && toggleAutofill == true) {
                                     autofill(rowNumber, colIndex)
                                 }
                                 
@@ -471,16 +487,34 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                     )
                     }
                 </div>
+                <br></br>
                 <div>
                     <p>
-                        (Tab) Stitch autocomplete (NOTE* will also autocomplete with highlight color, stitches are separated by space):
+                        (Tab) Stitch autocomplete (NOTE* circle checkmark toggles autocomplete, will also autocomplete with highlight color, stitches are separated by space):
                     </p>
-                    <textarea
-                    onChange={(event) => setAutoFll(event.target.value)}>
 
+                    <textarea
+                        style={{
+                            border: "1px solid #ccc"
+                        }}
+                        onChange={(event) => setAutoFll(event.target.value)}>
                     </textarea>
+                    <button onClick={autofillToggle}>
+                    {toggleAutofill ? (
+                         // Autofill on
+                        <CheckCircleIcon>                      
+                        </CheckCircleIcon>
+                    ) : (
+                        // Autofill off
+                        <CheckIcon>
+                        </CheckIcon>
+                    )}
+                    </button>
                 </div>
-                <div>
+                <div style={{
+                    display: "flex",
+                    flexDirection: "row"
+                }}>
                     <button 
                     className={knitGrid.saveProjectButton} 
                     onClick={() => handleSavingKnittingProject({
@@ -496,10 +530,60 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                         })}> 
                         Save project
                     </button>
+                    {/* Saving project, so show the icon */}
+                    {isSaving ? (
+                        <SaveCheck>
+
+                        </SaveCheck>
+                    ) :
+                    (
+                        <>
+                        </>
+                    )
+                    }
                 </div>
             </div>
             </div>
         </div>
     )
     
+}
+
+
+// Create a representation for a collection of  tasks, then display or
+// sort the task so that incomplete trasks appear before completed tasks
+
+interface User {
+    id: number;
+    name: string;
+    hobbies: string[];
+}
+
+const users: User[] = [
+    {
+        id: 1,
+        name: "John",
+        hobbies: ["Gaming", "Hiking"]
+    },
+    {
+        id: 2,
+        name: "Alice",
+        hobbies: ["Reading"]
+    }
+];
+
+// Sort tasks based on boolean complted
+function addHobby(users: User[], userID: number, newHobby: string): User[] {
+
+    // Create a new array, sort via if the task is completed or not.
+    return users.map((user) => {
+        if (user.id == userID) {
+        return {
+            ...user,
+            hobbies: [...user.hobbies, newHobby]
+        }
+    }
+
+        return user
+    })
 }
