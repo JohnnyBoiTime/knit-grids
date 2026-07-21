@@ -14,9 +14,13 @@ const page = () => {
 
   return (
     <div>
-        <KnittingProject stitches={knittingProject.stitches} nameOfProject={knittingProject.nameOfProject}></KnittingProject>
-    <div>
+      <div>
         <Link href='/saved-projects'> Saved projects</Link>
+    </div>
+    <br>
+    </br>
+    <div>
+        <KnittingProject stitches={knittingProject.stitches} nameOfProject={knittingProject.nameOfProject}></KnittingProject>
     </div>
     </div>
   )

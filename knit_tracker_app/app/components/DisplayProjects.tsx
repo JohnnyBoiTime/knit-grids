@@ -146,7 +146,7 @@ export default function DisplayProjects() {
                         required/>
                     </div>
                     <div>
-                        <button type="submit">
+                        <button type="submit" style={{cursor: "pointer"}}>
                             Create Project
                         </button>
                     </div>

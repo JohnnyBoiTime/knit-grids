@@ -31,6 +31,7 @@ const LoginPage = () => {
     
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
+    const [loginStatus, setLoginStatus] = useState(false)
     const [hidePassword, setHidePassword] = useState(true)
     const [errorMessage, setErrorMessage] = useState("")
 
@@ -40,6 +41,8 @@ const LoginPage = () => {
         e.preventDefault()
 
         try {
+
+            setLoginStatus(true)
             await loginUser({username, password})
 
             router.replace("/saved-projects")
@@ -88,6 +91,15 @@ const LoginPage = () => {
                 <button className="cursor-pointer" type="submit">
                     Login
                 </button>
+                {loginStatus ? (
+                    <p>
+                        Logging in...
+                    </p>
+                ) : (
+                    <>
+                    </>        
+                )
+            }
             </form>
             <div>
                 <Link href="/register">

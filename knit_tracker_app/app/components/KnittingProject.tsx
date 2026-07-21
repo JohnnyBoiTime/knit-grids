@@ -252,8 +252,10 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                                 if (beginFilling == true && stringIndex < lengthOfAutofill) {
 
                                     const oldGrid = knittingProject.progressGrid[rowIndex]?.[colIndex] ?? "" 
-                                
-                                    let newStitch = fillText[stringIndex] + ',' + color
+                                    
+                                    
+
+                                    let newStitch = fillText[stringIndex] + ',' + color + ',' + '1'
 
                                     const key = rowIndex.toString() + "," + colIndex.toString()
 
@@ -390,7 +392,7 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                                 }
 
                                 // Autofill feature!
-                                if (event.key === "Tab" && toggleAutofill == true) {
+                                if (event.key === "Tab" && toggleAutofill == true && autoFill) {
                                     autofill(rowNumber, colIndex)
                                 }
                                 
@@ -502,14 +504,28 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                     <button onClick={autofillToggle}>
                     {toggleAutofill ? (
                          // Autofill on
-                        <CheckCircleIcon>                      
+                        <CheckCircleIcon style={{cursor: "pointer"}}>                      
                         </CheckCircleIcon>
                     ) : (
                         // Autofill off
-                        <CheckIcon>
+                        <CheckIcon style={{cursor: "pointer"}}>
                         </CheckIcon>
                     )}
                     </button>
+                </div>
+                <div>
+                    {/* If there is nothing in autofill, do not do anything */}
+                    {autoFill == "" && toggleAutofill == true ? (
+                        <>
+                            <p>
+                                Autofill is empty!
+                            </p>
+                        </>
+                    ) : (
+                        <>
+
+                        </>
+                    )}
                 </div>
                 <div style={{
                     display: "flex",
@@ -531,8 +547,8 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                         Save project
                     </button>
                     {/* Saving project, so show the icon */}
-                    {isSaving ? (
-                        <SaveCheck>
+                    {isSaving? (
+                        <SaveCheck >
 
                         </SaveCheck>
                     ) :
