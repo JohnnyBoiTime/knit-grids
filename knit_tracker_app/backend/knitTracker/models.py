@@ -30,6 +30,7 @@ class KnittingProject(models.Model):
     progress_grid = models.JSONField(default=list, blank=True)
     notes = models.TextField(blank=True, default="")
     row_notes = models.JSONField(default=list, blank=True)
+    autofill = models.TextField(blank=True, default="")
     completed = models.BooleanField(default=False) # Lets user know if they finished their project
 
     # When the user started the project, and the last time they updated

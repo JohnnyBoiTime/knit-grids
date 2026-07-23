@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {useRouter} from "next/navigation"
 import loginStyles from './LoginPage.module.css'
 import csrfRoute from '../apiRoutes/csrfAPI'
@@ -31,6 +31,7 @@ const LoginPage = () => {
     
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
+    const [loginProgess, setLoginProgess] = useState("")
     const [loginStatus, setLoginStatus] = useState(false)
     const [hidePassword, setHidePassword] = useState(true)
     const [errorMessage, setErrorMessage] = useState("")
@@ -46,6 +47,7 @@ const LoginPage = () => {
             await loginUser({username, password})
 
             router.replace("/saved-projects")
+            setLoginStatus(false)
 
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
@@ -53,6 +55,20 @@ const LoginPage = () => {
             }
         }
     }
+
+    // For the loading animation thing to make it feel like it is loading
+    useEffect(() => {
+
+        let dotCount = 0
+
+        const interval = setInterval(() => {
+            dotCount = (++dotCount) % 4; //, 4 dots
+            setLoginProgess(`Logging in${".".repeat(dotCount)}`);
+        }, 500);
+
+        return () => clearInterval(interval)
+
+    }, [loginStatus])
 
   return (
     <div className={loginStyles.pageFormat}>
@@ -93,7 +109,7 @@ const LoginPage = () => {
                 </button>
                 {loginStatus ? (
                     <p>
-                        Logging in...
+                        {loginProgess}
                     </p>
                 ) : (
                     <>

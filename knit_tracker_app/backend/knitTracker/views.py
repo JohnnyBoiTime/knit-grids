@@ -47,6 +47,7 @@ def user_projects(request):
                 "progressGrid": savedProject.progress_grid,
                 "notes": savedProject.notes,
                 "rowNotes": savedProject.row_notes,
+                "autofill": savedProject.autofill,
                 "completed": savedProject.completed,
                 "createdAt": savedProject.created_at,
                 "updatedAt": savedProject.updated_at,
@@ -72,6 +73,7 @@ def user_projects(request):
             "progress_grid": data.get("progressGrid"),
             "notes": data.get("notes") or "",
             "row_notes": data.get("rowNotes") or [],
+            "autofill": data.get("autofill") or "",
             "completed": data.get("finished"),
         }
 
@@ -106,6 +108,7 @@ def user_projects(request):
                 "progressGrid": projects.progress_grid,
                 "notes": projects.notes,
                 "rowNotes": projects.row_notes,
+                "autofill": projects.autofill,
                 "completed": projects.completed,
                 "updatedAt": projects.updated_at,
                 "createdAt": projects.created_at,

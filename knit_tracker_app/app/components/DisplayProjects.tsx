@@ -2,11 +2,11 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import csrfRoute from '../apiRoutes/csrfAPI'
 import displayProjectStyles from './DisplayProjects.module.css'
-import{ useDeleteKnittingProjectMutation, useGetSavedKnittingProjectsQuery } from '../redux/slices/saveKnittingProjectSlice'
-import {useDispatch} from "react-redux"
-import {AppDispatch } from "../redux/store";
+import{ useDeleteKnittingProjectMutation, useGetSavedKnittingProjectsQuery, useAddKnittingProjectMutation } from '../redux/slices/saveKnittingProjectSlice'
+import {useDispatch, useSelector} from "react-redux"
+import {AppDispatch, RootState } from "../redux/store";
 import {useRouter} from "next/navigation"
-import { setNameOfProject, setStitches, setNeedleType, setNeedleSize, setYarnMaterial, setYarnWeight, setYarnYardage, setProjectID, reformatGrid, clearGrid, setNotes, setRowNotes, finishedProject, setProgressGrid  } from '../redux/slices/knittingProjectSlice'
+import { setNameOfProject, setStitches, setNeedleType, setNeedleSize, setYarnMaterial, setYarnWeight, setYarnYardage, setProjectID, reformatGrid, clearGrid, setNotes, setRowNotes, finishedProject, setProgressGrid, setAutofill  } from '../redux/slices/knittingProjectSlice'
 import Link from 'next/link'
 import KnittingProject from './KnittingProject';
 
@@ -25,6 +25,7 @@ type UserSelectedProject = {
     }
     notes: string
     rowNotes: string[]
+    autofill: string
     progressGrid: string[][]
     finished: boolean
 }
@@ -36,7 +37,11 @@ export default function DisplayProjects() {
 
     const [deleteProject] = useDeleteKnittingProjectMutation()
 
+    const [addProject] = useAddKnittingProjectMutation()
+
     const dispatch = useDispatch<AppDispatch>();
+
+    const knittingProject = useSelector((state: RootState) => state.knittingProject)
 
     const router = useRouter()
 
@@ -45,6 +50,17 @@ export default function DisplayProjects() {
 
     // Does the user actually have saved projects?
     const projects = data ? data : []
+
+
+    const saveProject = async (knittingProject: UserSelectedProject) => {
+        try {
+
+            await addProject(knittingProject).unwrap()
+
+        } catch (error) {
+            console.log("ERROR! " + error)
+        }
+    }
 
     // This is so we can display the selected projects information on the project page
     function displayUsersChosenProject(knittingProject: UserSelectedProject) {
@@ -58,16 +74,17 @@ export default function DisplayProjects() {
         dispatch(setYarnYardage(knittingProject.yarn.yardage))
         dispatch(setNotes(knittingProject.notes))
         dispatch(setRowNotes(knittingProject.rowNotes))
+        dispatch(setAutofill(knittingProject.autofill))
         dispatch(reformatGrid(knittingProject.progressGrid))
         dispatch(finishedProject(false))
         console.log(knittingProject)
     }
 
+    // Creating a new project just sets these to blank values so a new one can be created.
     function createNewProject(e: React.FormEvent) {
         e.preventDefault()
 
-        const progressGrid = {}
-
+        
         dispatch(setProjectID("Blank"))
         dispatch(setNameOfProject(projectName))
         dispatch(setStitches(Number(projectStitches)))
@@ -77,10 +94,26 @@ export default function DisplayProjects() {
         dispatch(setYarnWeight(""))
         dispatch(setYarnYardage(""))
         dispatch(setNotes(""))
+        dispatch(setAutofill(""))
         dispatch(setRowNotes([]))
         dispatch(finishedProject(false))
 
-        router.replace("/project-page")
+        // This automatically saves this project to the database. 
+        // Also, ensures that redux-persists works.
+        saveProject({
+               projectId: knittingProject.projectID,
+                        nameOfProject: projectName, 
+                        stitches: Number(projectStitches),
+                        needles: knittingProject.needles,
+                        yarn: knittingProject.yarn,
+                        progressGrid: knittingProject.progressGrid,
+                        notes: knittingProject.notes,
+                        rowNotes: [],
+                        autofill: knittingProject.autofill,
+                        finished: false,
+        })
+
+        router.push("/project-page")
     }
 
     // Delete the project from saved projects
@@ -113,7 +146,7 @@ export default function DisplayProjects() {
                 {projects.map((project) => (
                     <li key={project.projectId}>
                         <div className={displayProjectStyles.displayedProjects}>
-                            <Link href='/project-page' onClick={() => displayUsersChosenProject(project)}>
+                            <Link href="/project-page" onClick={() => displayUsersChosenProject(project)}>
                                 {project.nameOfProject}
                             </Link>
                             <button 

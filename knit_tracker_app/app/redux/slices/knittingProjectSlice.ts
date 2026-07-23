@@ -16,6 +16,7 @@ interface KnittingProjectState{
     }
     notes: string
     rowNotes: string[]
+    autofill: string
     progressGrid: string[][]
     finished: boolean
 }
@@ -35,6 +36,7 @@ const initialState: KnittingProjectState = {
     },
     notes: "",
     rowNotes: [],
+    autofill: "",
     progressGrid: [],
     finished: false
 }
@@ -86,6 +88,9 @@ const knittingProjectSlice = createSlice({
         setRowNotes(state, action: PayloadAction<string[]>) {
             state.rowNotes = action.payload
         },
+        setAutofill(state, action: PayloadAction<string>) {
+            state.autofill = action.payload
+        },
 
         // This is different from setProgressGrid. Used to set/reformat the entire grid.
         // So, when retrieving information from the database, this is used.
@@ -101,5 +106,5 @@ const knittingProjectSlice = createSlice({
     }
 })
 
-export const { setNameOfProject, setStitches, setNeedleType, setNeedleSize, setYarnMaterial, setYarnWeight, setYarnYardage, setProgressGrid, setNotes, setRowNotes, reformatGrid, clearGrid, finishedProject, setProjectID, setProgressGridColors } = knittingProjectSlice.actions
+export const { setNameOfProject, setStitches, setNeedleType, setNeedleSize, setYarnMaterial, setYarnWeight, setYarnYardage, setProgressGrid, setNotes, setRowNotes, reformatGrid, clearGrid, finishedProject, setProjectID, setAutofill, setProgressGridColors } = knittingProjectSlice.actions
 export default knittingProjectSlice.reducer

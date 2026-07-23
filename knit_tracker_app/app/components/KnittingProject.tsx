@@ -2,10 +2,9 @@
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import knitGrid from "./KnittingGrid.module.css"
-import {setNameOfProject, setStitches, setNeedleType, setNeedleSize, setYarnMaterial, setYarnWeight, setYarnYardage, setProgressGrid, setProgressGridColors, reformatGrid, setNotes, clearGrid, setProjectID} from "../redux/slices/knittingProjectSlice"
-import {useDispatch} from "react-redux"
+import {setNameOfProject, setStitches, setNeedleType, setNeedleSize, setYarnMaterial, setYarnWeight, setYarnYardage, setProgressGrid, setProgressGridColors, reformatGrid, setNotes, setAutofill, clearGrid, setProjectID} from "../redux/slices/knittingProjectSlice"
+import {useDispatch, useSelector} from "react-redux"
 import {AppDispatch } from "../redux/store";
-import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import { current } from "@reduxjs/toolkit";
 import { useAddKnittingProjectMutation } from "../redux/slices/saveKnittingProjectSlice"
@@ -49,6 +48,7 @@ type KnitProjectFormat = {
     }
     notes: string
     rowNotes: string[]
+    autofill: string
     progressGrid: string[][]
     finished: boolean
 }
@@ -78,14 +78,16 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
     const [currentPosition, setCurrentPosition] = useState<string>(`${stitches},20`)
     const [color, setColor] = useState("yellow")
     const [positionOfTools, setPositionOfTools] = useState(1)
-    const [autoFill, setAutoFll] = useState("")
+    const [autoFill, setAutoFill] = useState("")
     const [startSelecting, setStartSelecting] = useState<boolean>(false)
     const [projectName, setProjectName] = useState<string>(() => nameOfProject) // Change project name
 
     const dispatch = useDispatch<AppDispatch>();
 
+    const projectAlreadyExists = useRef(false)
+
     // Stores ref to every HTML element, this is so 
-    //  the cursor is moved around the inputs when doing
+    // the cursor is moved around the inputs when doing
     // things like autofill. The coordinates of the 
     // input is mapped to itself, this is so
     // we can store refs to the inputs
@@ -105,16 +107,21 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
 
     useEffect(() => {
 
+        projectAlreadyExists.current = true
+
+        if (projectAlreadyExists.current == true) {
+            return
+        }
+
         // Create grid when starting a new project
         if (knittingProject.projectID === "Blank") {
 
             const startingArray = Array.from({length: 1}, 
                 () => Array.from({length: stitches}, () => ",")
             )
-            dispatch(reformatGrid(startingArray))
         }
 
-        // Only render starting grid once
+    // Only render starting grid once
     }, [])
 
     // Make sure to store all of the users row notes here
@@ -227,6 +234,7 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
             // like BRK
             const fillText: string[] = autoFill.split(" ")
             const lengthOfAutofill = fillText.length
+            dispatch(setAutofill(autoFill))
 
             let stringIndex = 0
 
@@ -499,7 +507,8 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                         style={{
                             border: "1px solid #ccc"
                         }}
-                        onChange={(event) => setAutoFll(event.target.value)}>
+                        defaultValue={knittingProject.autofill}
+                        onChange={(event) => setAutoFill(event.target.value)}>
                     </textarea>
                     <button onClick={autofillToggle}>
                     {toggleAutofill ? (
@@ -542,6 +551,7 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                         progressGrid: knittingProject.progressGrid,
                         notes: knittingProject.notes,
                         rowNotes: rowNotes,
+                        autofill: knittingProject.autofill,
                         finished: false,
                         })}> 
                         Save project
