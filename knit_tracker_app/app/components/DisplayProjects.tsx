@@ -98,21 +98,6 @@ export default function DisplayProjects() {
         dispatch(setRowNotes([]))
         dispatch(finishedProject(false))
 
-        // This automatically saves this project to the database. 
-        // Also, ensures that redux-persists works.
-        saveProject({
-               projectId: knittingProject.projectID,
-                        nameOfProject: projectName, 
-                        stitches: Number(projectStitches),
-                        needles: knittingProject.needles,
-                        yarn: knittingProject.yarn,
-                        progressGrid: knittingProject.progressGrid,
-                        notes: knittingProject.notes,
-                        rowNotes: [],
-                        autofill: knittingProject.autofill,
-                        finished: false,
-        })
-
         router.push("/project-page")
     }
 
@@ -137,8 +122,10 @@ export default function DisplayProjects() {
     return (
         <div>
             <div>
-                <Link href="/project-page" >Go Back</Link> 
+                <Link href="/project-page" >Go Back to Current Project</Link> 
             </div>
+            <br>
+            </br>
             <p>
                 Saved projects:
             </p>

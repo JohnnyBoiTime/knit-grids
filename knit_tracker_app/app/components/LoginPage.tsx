@@ -6,6 +6,7 @@ import csrfRoute from '../apiRoutes/csrfAPI'
 import Link from "next/link"
 import {Eye, EyeOff} from "lucide-react"
 import axios from 'axios';
+import { error } from 'next/dist/build/output/log';
 
 interface User {
     username: string
@@ -43,11 +44,22 @@ const LoginPage = () => {
 
         try {
 
-            setLoginStatus(true)
-            await loginUser({username, password})
+           
+            const response = await loginUser({username, password})
 
-            router.replace("/saved-projects")
-            setLoginStatus(false)
+            console.log(response)
+
+            // Login credentials ok!
+            if (response.data.detail != "Invalid username or password") {
+                setLoginStatus(true)
+                router.replace("/saved-projects")
+                setLoginStatus(false)
+            }
+
+            // Not good
+            else {
+                setErrorMessage("Incorrect user name or password")
+            }
 
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
@@ -56,17 +68,25 @@ const LoginPage = () => {
         }
     }
 
-    // For the loading animation thing to make it feel like it is loading
+    // For the loading animation thing to make it feel like it is loading.
+    // Sometimes, it will just not have an "animation". this
+    // happens if the user puts an incorrect passsword, but then their
+    // correct password
     useEffect(() => {
 
         let dotCount = 0
 
-        const interval = setInterval(() => {
-            dotCount = (++dotCount) % 4; //, 4 dots
-            setLoginProgess(`Logging in${".".repeat(dotCount)}`);
-        }, 500);
+        if (errorMessage != "Incorrect user name or password!") {
+        
+            const interval = setInterval(() => {
+                dotCount = (++dotCount) % 4; //, 4 dots
+                setLoginProgess(`Logging in${".".repeat(dotCount)}`);
+            }, 20);
 
-        return () => clearInterval(interval)
+            return () => clearInterval(interval)
+        }
+
+
 
     }, [loginStatus])
 
@@ -103,6 +123,9 @@ const LoginPage = () => {
                         )
                         }
                     </button>
+                    <div>
+                        {errorMessage}
+                    </div>
                 </div>
                 <button className="cursor-pointer" type="submit">
                     Login

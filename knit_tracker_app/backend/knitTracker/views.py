@@ -154,14 +154,18 @@ def user_login(request):
 
     user = authenticate(request, username = data.get("username"), password = data.get("password"))
 
+
     # User did not exist, so something happened
     if user is None:
+        print(user)
         return JsonResponse({
-            "detail": "Invalid user input or user DNE", 
+            "detail": "Invalid username or password", 
             "csrfToken": get_token(request)
             })
+        
 
     login(request, user)
+
     rotate_token(request)
 
     return JsonResponse({

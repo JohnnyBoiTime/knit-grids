@@ -73,18 +73,16 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
 
     const [selectedStitches, setSelectedStitches] = useState<Set<string>>(new Set())
     const [toggleAutofill, setToggleAutofill] = useState(false)
+    const [hasSaved, setHasSaved] = useState(true)
     const [projectNotes, setProjectNotes] = useState("")
     const [rowNotes, setRowNotes] = useState([""])
     const [currentPosition, setCurrentPosition] = useState<string>(`${stitches},20`)
     const [color, setColor] = useState("yellow")
     const [positionOfTools, setPositionOfTools] = useState(1)
-    const [autoFill, setAutoFill] = useState("")
     const [startSelecting, setStartSelecting] = useState<boolean>(false)
     const [projectName, setProjectName] = useState<string>(() => nameOfProject) // Change project name
 
     const dispatch = useDispatch<AppDispatch>();
-
-    const projectAlreadyExists = useRef(false)
 
     // Stores ref to every HTML element, this is so 
     // the cursor is moved around the inputs when doing
@@ -107,22 +105,28 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
 
     useEffect(() => {
 
-        projectAlreadyExists.current = true
-
-        if (projectAlreadyExists.current == true) {
-            return
-        }
-
         // Create grid when starting a new project
         if (knittingProject.projectID === "Blank") {
 
             const startingArray = Array.from({length: 1}, 
                 () => Array.from({length: stitches}, () => ",")
             )
+
+            dispatch(reformatGrid(startingArray))
+
+            setHasSaved(false)
         }
 
     // Only render starting grid once
     }, [])
+
+
+    // Anytime the user makes a change to anything, indicate that they have not saved their project
+    useEffect(() => {
+        setHasSaved(false)
+    }, [knittingProject.nameOfProject, knittingProject.stitches, knittingProject.needles, 
+        knittingProject.yarn, knittingProject.notes, knittingProject.rowNotes, 
+        knittingProject.progressGrid, knittingProject.finished])
 
     // Make sure to store all of the users row notes here
     function updateRowNotes(row: number, note: string) {
@@ -153,12 +157,13 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
     const handleSavingKnittingProject = async (savedProject: KnitProjectFormat) => {
         try {
 
-
             console.log(savedProject)
 
             const result = await addKnittingProject(savedProject).unwrap()
 
             dispatch(setProjectID(result.projectId))
+
+            setHasSaved(true)
 
         } catch (error) {
             console.error("Could not save project!", error)
@@ -223,6 +228,7 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                 dispatch(setProgressGrid({stitchRow: stitchRow, col: column, stitchInfo: updateStitches}))
             }
         }
+
     }
 
     // Autofills the stitches from the starting row and column.
@@ -232,9 +238,8 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
             // Split the string via whitespace so
             // you can have mult-character stitches
             // like BRK
-            const fillText: string[] = autoFill.split(" ")
+            const fillText: string[] = knittingProject.autofill.split(" ")
             const lengthOfAutofill = fillText.length
-            dispatch(setAutofill(autoFill))
 
             let stringIndex = 0
 
@@ -293,8 +298,7 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
 
                         // Move the cursor there too
                         moveCursor(startingRow - 1, startingCol + lengthOfAutofill - 1)
-
-
+                        
                         dispatch(reformatGrid(updatedArray))
         
     }
@@ -400,7 +404,7 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                                 }
 
                                 // Autofill feature!
-                                if (event.key === "Tab" && toggleAutofill == true && autoFill) {
+                                if (event.key === "Tab" && toggleAutofill == true && knittingProject.autofill) {
                                     autofill(rowNumber, colIndex)
                                 }
                                 
@@ -508,7 +512,7 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                             border: "1px solid #ccc"
                         }}
                         defaultValue={knittingProject.autofill}
-                        onChange={(event) => setAutoFill(event.target.value)}>
+                        onChange={(event) => dispatch(setAutofill(event.target.value))}>
                     </textarea>
                     <button onClick={autofillToggle}>
                     {toggleAutofill ? (
@@ -524,7 +528,7 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                 </div>
                 <div>
                     {/* If there is nothing in autofill, do not do anything */}
-                    {autoFill == "" && toggleAutofill == true ? (
+                    {toggleAutofill == true  && knittingProject.autofill == "" ? (
                         <>
                             <p>
                                 Autofill is empty!
@@ -557,7 +561,7 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                         Save project
                     </button>
                     {/* Saving project, so show the icon */}
-                    {isSaving? (
+                    {isSaving ? (
                         <SaveCheck >
 
                         </SaveCheck>
@@ -567,6 +571,17 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                         </>
                     )
                     }
+                    {hasSaved ? (
+                        <></>
+                    ) : (
+                        <div style={{
+                            paddingTop: 5
+                        }}>
+                        <p>
+                        (This project has unsaved changes)
+                        </p>
+                        </div>
+                    )}
                 </div>
             </div>
             </div>

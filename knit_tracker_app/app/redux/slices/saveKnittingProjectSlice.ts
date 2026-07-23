@@ -39,6 +39,7 @@ type KnitProjectInfo = {
     progressGrid: string[][]
     notes: string
     rowNotes: string[]
+    autofill: string
     finished: boolean
     createdAt: string
     updatedAt: string
