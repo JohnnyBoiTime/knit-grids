@@ -92,7 +92,7 @@ const LoginPage = () => {
   return (
     <div className={loginStyles.pageFormat}>
         <div className={loginStyles.loginPageTitle}>
-            Welcome to knit tracker!
+            Welcome to Knit Grids!
         </div>
         <div className={loginStyles.loginCard}>
             <form onSubmit={loginForm} className={loginStyles.formFormat}>
