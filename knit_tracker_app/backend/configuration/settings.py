@@ -40,6 +40,29 @@ SECURE_HSTS_SECONDS = 0
 #SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 #SECURE_HSTS_PRELOAD = True
 
+# EMAIL PASSWORD RECOVERY BELOW!!!
+
+# For terminal/testing
+# EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+# For actual email addreses/production
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+EMAIL_HOST = "smtp.gmail.com"
+
+EMAIL_PORT = 587
+
+EMAIL_USE_TLS = True
+
+EMAIL_HOST_USER = os.environ.get("GMAIL")
+EMAIL_HOST_PASSWORD = os.environ.get("E_PASSWORD")
+
+FRONTEND_URL = os.environ.get("URL_FRONTEND")
+
+PASSWORD_RESET_TIMEOUT = 60 * 60
+
+DEFAULT_FROM_EMAIL = f"KnitTacker <{EMAIL_HOST_USER}>"
+
 ALLOWED_HOSTS = [    
     "localhost",
     "127.0.0.1",

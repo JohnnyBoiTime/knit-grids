@@ -1,17 +1,23 @@
+import json
+
+from django.conf import settings
+from django.contrib.auth import authenticate, get_user_model, login
+from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
+from django.core.serializers.json import DjangoJSONEncoder
+from django.http import JsonResponse
+from django.middleware.csrf import get_token, rotate_token
 from django.shortcuts import render
-from rest_framework import viewsets, permissions
+from django.utils.encoding import force_str
+from django.utils.http import urlsafe_base64_decode
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.http import require_GET
+from django_ratelimit.decorators import ratelimit
+from rest_framework import permissions, viewsets
 from rest_framework.views import APIView
+
 from .models import KnittingProject
 from .serializers import ProjectSerializer
-from django_ratelimit.decorators import ratelimit
-from django.views.decorators.http import require_GET
-from django.middleware.csrf import get_token, rotate_token
-from django.views.decorators.csrf import ensure_csrf_cookie
-from django.contrib.auth import authenticate, login
-from django.http import JsonResponse
-from django.contrib.auth.models import User
-from django.core.serializers.json import DjangoJSONEncoder
-import json
+
 
 
 class KnittingProjectView(APIView):
@@ -33,8 +39,8 @@ def user_projects(request):
     # Grab the users projects
     if request.method == 'GET':
         query_database_for_projects = (KnittingProject.objects
-                                    .filter(user=user)
-                                    )
+                                       .filter(user=user)
+                                       )
     
         # Send the users information about their projects to front end
         data = [
@@ -183,6 +189,8 @@ def register_user(request):
     email = data.get("email") # email is used only for resetting password
     password = data.get("password")
 
+    print(data)
+
     # Username already exists
     if User.objects.filter(username=username).exists():
         return JsonResponse({ "detail": "Someone already has that username!"}, status=400)
@@ -201,3 +209,84 @@ def currently_logged_in_user(request):
     return JsonResponse({
         "username": user.username,
     })
+
+
+User = get_user_model()
+
+# E-mail password recovery request
+def reset_password_email(request):
+
+    data = json.loads(request.body)
+
+    # Makes sure all e-mails are the standard username@email.com
+    email = str(data.get("email", "")).strip().lower()
+
+    # The official password reset form
+    reset_form = PasswordResetForm({
+        "email": email
+    })
+
+    if not reset_form.is_valid():
+        return JsonResponse({
+            "detail": "Could not find the e-mail address",
+        }, status=400)
+
+    # Password reset form, sends e-mail to specified address
+    reset_form.save(
+        request=request,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        subject_template_name="reset_password_stuff/reset_password_email_subject.txt",
+        email_template_name="reset_password_stuff/reset_password_email_body.txt",
+        extra_email_context= {
+            "frontend_url": settings.FRONTEND_URL
+        }
+    )
+
+    return JsonResponse({
+        "detail": (
+            "A password-reset link has been sent to that e-mail address!"
+        )
+    })
+
+# Logic for actually changing the password
+def reset_password(request, uid, token):
+    """
+    resets the users password.
+
+    param request: The JSON request sent by the client
+    uid: The id of the user that is requesting the password change,
+    used to identify their password in the database
+    token: makes sure it is a valid request
+    """
+
+    data = json.loads(request.body)
+
+    # Turn the id into a reguler string in order
+    # to find where the user is in the database for
+    # password retrieval
+    user_id = force_str(
+        urlsafe_base64_decode(uid)
+    )
+
+    user = User.objects.get(pk=user_id)
+
+    # Sent from the front-end to acquire the new password
+    new_password = data.get("newPassword", "")
+    confirm_new_password = data.get("confirmNewPassword", "")
+
+    # Change the password in the database
+    password_form = SetPasswordForm(
+        user=user,
+        data={
+            "new_password1": new_password,
+            "new_password2": confirm_new_password
+        }
+    )
+
+    password_form.save()
+
+    return JsonResponse({
+        "detail": "Password was reset successfully!"
+    })
+
+

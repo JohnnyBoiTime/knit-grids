@@ -1,8 +1,6 @@
 'use client';
-import React from 'react'
 import Link from "next/link"
 import KnittingProject from '../components/KnittingProject'
-import { setNameOfProject, setStitches, setNeedleType, setNeedleSize, setYarnMaterial, setYarnWeight, setYarnYardage, setProjectID, reformatGrid, clearGrid, setNotes, setRowNotes, finishedProject } from '../redux/slices/knittingProjectSlice'
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 

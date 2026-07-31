@@ -24,6 +24,10 @@
 .DS_Store
 *.pem
 
+# Under production so make sure it is not accessed.
+forgot-password
+resetPassword
+
 # debug
 npm-debug.log*
 yarn-debug.log*
@@ -39,3 +43,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+backend2

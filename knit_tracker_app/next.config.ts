@@ -14,7 +14,8 @@ const nextConfig: NextConfig = {
      },
      {
        source: '/api/:path*',
-       destination: `${process.env.NEXT_PUBLIC_DJANGO_API_ROUTE}/:path*`, 
+      // destination: `${process.env.NEXT_PUBLIC_DJANGO_API_ROUTE}/:path*`, // Django configuration
+      destination: `${process.env.NEXT_PUBLIC_ASPNET_API_ROUTE}/:path*` // ASP.NET configuration
      },
     ];
   },

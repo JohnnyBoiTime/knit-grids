@@ -51,9 +51,15 @@ type DeleteKnitProject = {
 
 // Grab the csrf token for the users session
 const getCsrfToken = async () => {
-    const result = await fetch(`${process.env.NEXT_PUBLIC_DJANGO_API_ROUTE}/csrf/`, {
+   /* const result = await fetch(`${process.env.NEXT_PUBLIC_DJANGO_API_ROUTE}/csrf/`, {
         credentials: "include",
     });
+    */
+
+    const result = await fetch(`${process.env.NEXT_PUBLIC_ASPNET_API_ROUTE}/csrf/`, {
+        credentials: "include",
+    });
+
     if (!result.ok) {
         throw new Error("DID NOT WORK!");
     }
@@ -67,7 +73,8 @@ const getCsrfToken = async () => {
 export const savedKnittingProjectsAPI = createApi({
     reducerPath: "knittingProjects",
     baseQuery: fetchBaseQuery({
-        baseUrl: process.env.NEXT_PUBLIC_DJANGO_API_ROUTE,
+        // baseUrl: process.env.NEXT_PUBLIC_DJANGO_API_ROUTE,
+        baseUrl: process.env.NEXT_PUBLIC_ASPNET_API_ROUTE,
         credentials: "include",
     }),
     tagTypes: ['KnittingProjects'],

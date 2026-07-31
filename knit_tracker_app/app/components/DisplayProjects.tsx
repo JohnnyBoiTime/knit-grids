@@ -1,6 +1,5 @@
 'use client';
-import React, { useCallback, useEffect, useState } from 'react'
-import csrfRoute from '../apiRoutes/csrfAPI'
+import React, { useState } from 'react'
 import displayProjectStyles from './DisplayProjects.module.css'
 import{ useDeleteKnittingProjectMutation, useGetSavedKnittingProjectsQuery, useAddKnittingProjectMutation } from '../redux/slices/saveKnittingProjectSlice'
 import {useDispatch, useSelector} from "react-redux"
@@ -8,7 +7,6 @@ import {AppDispatch, RootState } from "../redux/store";
 import {useRouter} from "next/navigation"
 import { setNameOfProject, setStitches, setNeedleType, setNeedleSize, setYarnMaterial, setYarnWeight, setYarnYardage, setProjectID, reformatGrid, clearGrid, setNotes, setRowNotes, finishedProject, setProgressGrid, setAutofill  } from '../redux/slices/knittingProjectSlice'
 import Link from 'next/link'
-import KnittingProject from './KnittingProject';
 
 type UserSelectedProject = {
     projectId: string

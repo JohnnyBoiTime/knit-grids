@@ -27,10 +27,11 @@ const RegisterPage = () => {
     const [password, setPassword] = useState("")
     const [hidePassword, setHidePassword] = useState(true)
 
+
     async function registerForm(e: React.FormEvent) {
         e.preventDefault()
 
-        await registerUser({username, email, password})
+        const response = await registerUser({username, email, password})
 
     }
 

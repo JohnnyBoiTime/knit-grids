@@ -6,7 +6,6 @@ import csrfRoute from '../apiRoutes/csrfAPI'
 import Link from "next/link"
 import {Eye, EyeOff} from "lucide-react"
 import axios from 'axios';
-import { error } from 'next/dist/build/output/log';
 
 interface User {
     username: string
@@ -140,10 +139,18 @@ const LoginPage = () => {
                 )
             }
             </form>
-            <div>
+            <div style={{
+                display: "flex",
+                flexDirection: "column"
+            }}>
                 <Link href="/register">
                     Create an Account
                 </Link>
+                {/*
+                <Link href="/forgot-password">
+                    Forgot password
+                </Link>
+                */}
             </div>
         </div>
     </div>

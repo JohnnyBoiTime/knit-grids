@@ -1,14 +1,13 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import knitGrid from "./KnittingGrid.module.css"
-import {setNameOfProject, setStitches, setNeedleType, setNeedleSize, setYarnMaterial, setYarnWeight, setYarnYardage, setProgressGrid, setProgressGridColors, reformatGrid, setNotes, setAutofill, clearGrid, setProjectID} from "../redux/slices/knittingProjectSlice"
+import {setNeedleType, setNeedleSize, setYarnMaterial, setYarnWeight, setYarnYardage, setProgressGrid, setProgressGridColors, reformatGrid, setNotes, setAutofill, clearGrid, setProjectID} from "../redux/slices/knittingProjectSlice"
 import {useDispatch, useSelector} from "react-redux"
 import {AppDispatch } from "../redux/store";
 import { RootState } from "../redux/store";
-import { current } from "@reduxjs/toolkit";
 import { useAddKnittingProjectMutation } from "../redux/slices/saveKnittingProjectSlice"
-import { CheckCheckIcon, CheckCircleIcon, CheckIcon, SaveCheck } from "lucide-react";
+import {  CheckCircleIcon, CheckIcon, SaveCheck } from "lucide-react";
 
 type Stitches = string
 
@@ -16,19 +15,6 @@ type Stitches = string
 interface KnittingGridProps {
     stitches: number
     nameOfProject: string
-}
-
-// Info for needles
-interface needles {
-    type: string
-    size: number
-}
-
-// Info for yarn
-interface yarn {
-    material: string
-    weight: number
-    yardage: number
 }
 
 // Format of project we 
@@ -267,7 +253,6 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                                     const oldGrid = knittingProject.progressGrid[rowIndex]?.[colIndex] ?? "" 
                                     
                                     
-
                                     let newStitch = fillText[stringIndex] + ',' + color + ',' + '1'
 
                                     const key = rowIndex.toString() + "," + colIndex.toString()
@@ -280,7 +265,6 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                                     })
 
                                     stringIndex++
-                                    
 
                                     return newStitch ?? oldGrid
                                 }
@@ -588,43 +572,4 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
         </div>
     )
     
-}
-
-
-// Create a representation for a collection of  tasks, then display or
-// sort the task so that incomplete trasks appear before completed tasks
-
-interface User {
-    id: number;
-    name: string;
-    hobbies: string[];
-}
-
-const users: User[] = [
-    {
-        id: 1,
-        name: "John",
-        hobbies: ["Gaming", "Hiking"]
-    },
-    {
-        id: 2,
-        name: "Alice",
-        hobbies: ["Reading"]
-    }
-];
-
-// Sort tasks based on boolean complted
-function addHobby(users: User[], userID: number, newHobby: string): User[] {
-
-    // Create a new array, sort via if the task is completed or not.
-    return users.map((user) => {
-        if (user.id == userID) {
-        return {
-            ...user,
-            hobbies: [...user.hobbies, newHobby]
-        }
-    }
-
-        return user
-    })
 }

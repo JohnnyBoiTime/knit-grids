@@ -1,4 +1,3 @@
-import React from 'react'
 import  DisplayProjects  from '../components/DisplayProjects'
 
 const page = () => {
