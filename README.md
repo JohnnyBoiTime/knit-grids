@@ -1,4 +1,4 @@
-# ~knit-tracker
+# ~knit-tracker~
 
 Now KnitGrids!
 
