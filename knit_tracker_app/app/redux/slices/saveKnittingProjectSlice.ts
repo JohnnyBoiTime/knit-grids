@@ -74,7 +74,7 @@ export const savedKnittingProjectsAPI = createApi({
     reducerPath: "knittingProjects",
     baseQuery: fetchBaseQuery({
         // baseUrl: process.env.NEXT_PUBLIC_DJANGO_API_ROUTE,
-        baseUrl: process.env.NEXT_PUBLIC_ASPNET_API_ROUTE,
+        baseUrl: `${process.env.NEXT_PUBLIC_ASPNET_API_ROUTE}/api`,
         credentials: "include",
     }),
     tagTypes: ['KnittingProjects'],
