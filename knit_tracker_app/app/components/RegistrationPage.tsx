@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react'
 import loginStyles from './LoginPage.module.css'
-import {useRouter} from "next/router"
+import {useRouter} from "next/navigation"
 import csrfRoute from '../apiRoutes/csrfAPI'
 import Link from "next/link"
 import {Eye, EyeOff} from "lucide-react"
