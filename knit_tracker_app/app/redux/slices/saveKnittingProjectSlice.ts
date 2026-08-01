@@ -56,7 +56,7 @@ const getCsrfToken = async () => {
     });
     */
 
-    const result = await fetch(`${process.env.NEXT_PUBLIC_ASPNET_API_ROUTE}/csrf/`, {
+    const result = await fetch(`${process.env.NEXT_PUBLIC_ASPNET_API_ROUTE}/api/csrf/`, {
         credentials: "include",
     });
 
