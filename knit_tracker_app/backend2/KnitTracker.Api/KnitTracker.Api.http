@@ -1,0 +1,6 @@
+@KnitTracker.Api_HostAddress = http://localhost:5070
+
+GET {{KnitTracker.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

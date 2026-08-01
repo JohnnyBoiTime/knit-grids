@@ -4,7 +4,7 @@ import {useRouter} from "next/navigation"
 import loginStyles from './LoginPage.module.css'
 import csrfRoute from '../apiRoutes/csrfAPI'
 import Link from "next/link"
-import {Eye, EyeOff} from "lucide-react"
+import {SquareCheckBig, Eye, EyeOff, Square, Text} from "lucide-react"
 import axios from 'axios';
 
 interface User {
@@ -15,7 +15,8 @@ interface User {
 
 interface Login {
     username: string
-    password: string    
+    password: string 
+    rememberMe: boolean   
 }
 
 // Login the user
@@ -25,12 +26,12 @@ async function loginUser(data: Login) {
     
 }
 
-
 const LoginPage = () => {
 
     
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
+    const [rememberMe, setRememberMe] = useState(false)
     const [loginProgess, setLoginProgess] = useState("")
     const [loginStatus, setLoginStatus] = useState(false)
     const [hidePassword, setHidePassword] = useState(true)
@@ -38,13 +39,12 @@ const LoginPage = () => {
 
     const router = useRouter()
 
+    // Log the user in
     async function loginForm(e: React.FormEvent) {
         e.preventDefault()
 
         try {
-
-           
-            const response = await loginUser({username, password})
+            const response = await loginUser({username, password, rememberMe})
 
             console.log(response)
 
@@ -66,6 +66,8 @@ const LoginPage = () => {
             }
         }
     }
+
+
 
     // For the loading animation thing to make it feel like it is loading.
     // Sometimes, it will just not have an "animation". this
@@ -129,6 +131,27 @@ const LoginPage = () => {
                 <button className="cursor-pointer" type="submit">
                     Login
                 </button>
+                <div style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    marginLeft: "50px",
+                    gap: "10px"
+                }}>
+                Remember me:
+                <button 
+                type="button"
+                onClick={() => setRememberMe(!rememberMe)}
+                >
+                {rememberMe ? (
+                    <SquareCheckBig/>
+                ) : (
+                    <Square/>
+                )
+                }
+                </button>
+                </div>
+
                 {loginStatus ? (
                     <p>
                         {loginProgess}

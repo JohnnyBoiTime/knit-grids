@@ -1,7 +1,16 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# See https://help.github.com/articles/ignoring-files/
 
-# dependencies
-/node_modules
+# for more information about ignoring files.
+
+############################
+
+# Next.js / Node.js
+
+############################
+
+# Dependencies
+
+/node_modules/
 /.pnp
 .pnp.*
 .yarn/*
@@ -10,38 +19,148 @@
 !.yarn/releases
 !.yarn/versions
 
-# testing
-/coverage
+# Testing
 
-# next.js
+/coverage/
+
+# Next.js
+
 /.next/
 /out/
 
-# production
-/build
+# Production builds
 
-# misc
-.DS_Store
-*.pem
+/build/
 
-# Under production so make sure it is not accessed.
-forgot-password
-resetPassword
+# Debug logs
 
-# debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# TypeScript
 
-# vercel
-.vercel
-
-# typescript
 *.tsbuildinfo
 next-env.d.ts
 
-backend2
+# Vercel
+
+.vercel/
+
+############################
+
+# ASP.NET Core / .NET
+
+############################
+
+# Compiled build output
+
+**/bin/
+**/obj/
+**/artifacts/
+
+# Visual Studio
+
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.csproj.user
+
+# Visual Studio publish-user settings
+
+*.pubxml.user
+
+# JetBrains Rider
+
+.idea/
+*.sln.iml
+
+# Test results and code coverage
+
+TestResults/
+**/TestResults/
+*.coverage
+*.coveragexml
+coverage.*
+.coverage
+
+# Benchmark results
+
+BenchmarkDotNet.Artifacts/
+
+# NuGet packages and generated package files
+
+*.nupkg
+*.snupkg
+packages/
+
+# Local ASP.NET configuration
+
+appsettings.Local.json
+appsettings.*.Local.json
+
+# ASP.NET user-secret files, if copied into the repository
+
+secrets.json
+
+# Local databases
+
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# Application logs
+
+logs/
+**/logs/
+*.log
+
+############################
+
+# Secrets and environment files
+
+############################
+
+# Environment files
+
+.env
+.env.*
+!.env.example
+
+# Certificates and private keys
+
+*.pem
+*.pfx
+*.p12
+*.key
+
+############################
+
+# Operating system files
+
+############################
+
+.DS_Store
+Thumbs.db
+desktop.ini
+
+############################
+
+# Temporary files
+
+############################
+
+*.tmp
+*.temp
+*.bak
+*.swp
+*~
+
+# Under construction:
+forgot-password
+resetPassword
