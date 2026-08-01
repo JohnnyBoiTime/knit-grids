@@ -1,6 +1,7 @@
 'use client'
 import React, { useState } from 'react'
 import loginStyles from './LoginPage.module.css'
+import {useRouter} from "next/router"
 import csrfRoute from '../apiRoutes/csrfAPI'
 import Link from "next/link"
 import {Eye, EyeOff} from "lucide-react"
@@ -21,17 +22,30 @@ async function registerUser(data: User) {
 
 const RegisterPage = () => {
 
-    
     const [username, setUsername] = useState("")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [hidePassword, setHidePassword] = useState(true)
 
 
+    const router = useRouter()
+
     async function registerForm(e: React.FormEvent) {
         e.preventDefault()
 
-        const response = await registerUser({username, email, password})
+        try {
+
+            // See what it brings back.
+            const response = await registerUser({username, email, password})
+
+            // It was successfull, so go to login page.
+            if (response.data) {
+                router.replace("/")
+            }
+
+        } catch (error) {
+            console.log(error)
+        }
 
     }
 
