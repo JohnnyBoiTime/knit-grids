@@ -7,21 +7,8 @@ public record NeedleDto(string Type, string Size);
 public record YarnDto(string Material, string Weight, string Yardage);
 
 // Information for the project we want to save into the database.
-public record ProjectsFromDatabase(
+public record ProjectsDatabaseFormat(
     string ProjectId,
-    string NameOfProject,
-    int Stitches,
-    NeedleDto Needles,
-    YarnDto Yarn,
-    string[][] ProgressGrid,
-    string Notes,
-    string[] RowNotes,
-    string Autofill,
-    bool Complete
-);
-
-public record SaveProjectToDatabase(
-    string ProjectId, // Need to determine which one we are saving/updating.
     string NameOfProject,
     int Stitches,
     NeedleDto Needles,

@@ -20,7 +20,7 @@ public class UserProjectsController : ControllerBase
     
    // Turn info from database into JSON to send to front end to display users
    // saved projects from the database
-   private ProjectsFromDatabase ProjectInfoFromDatabase(KnittingProject project)
+   private ProjectsDatabaseFormat ProjectInfoFromDatabase(KnittingProject project)
     {
         var needles = JsonSerializer.Deserialize<NeedleDto>(project.Needles) ?? new NeedleDto("", "");
 
@@ -30,7 +30,7 @@ public class UserProjectsController : ControllerBase
 
         var rowNotes = JsonSerializer.Deserialize<string[]>(project.RowNotes) ?? [];
 
-        return new ProjectsFromDatabase(
+        return new ProjectsDatabaseFormat(
             ProjectId: project.ProjectId.ToString(),
             NameOfProject: project.NameOfProject,
             Stitches: project.Stitches,
@@ -45,7 +45,7 @@ public class UserProjectsController : ControllerBase
     }    
 
     // Turn C# into JSON fields to save/update database projects.
-   private void UpdateDatabaseProjects(SaveProjectToDatabase request, KnittingProject project)
+   private void UpdateDatabaseProjects(ProjectsDatabaseFormat request, KnittingProject project)
     {
 
         project.NameOfProject = request.NameOfProject;
@@ -67,6 +67,7 @@ public class UserProjectsController : ControllerBase
         project.Completed = request.Complete;
     }   
 
+    // Inject the database context and user manager services to the controller.
     public UserProjectsController(AppDbContext context, UserManager<ApplicationUser> userManager)
     {
         _context = context;
@@ -94,10 +95,10 @@ public class UserProjectsController : ControllerBase
 
     }
 
-    // Save or graba single project from the database
+    // Save or grab single project from the database
     [Authorize]
     [HttpPost]
-    public async Task<IActionResult> SaveProject(SaveProjectToDatabase request)
+    public async Task<IActionResult> SaveProject(ProjectsDatabaseFormat request)
     {
         var userId = _userManager.GetUserId(User);
 

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace KnitTracker.Api.Data;
 
-// Inherits from IdentityDbContext for database functionality.
+// Inherits from IdentityDbContext for database functionality. Sets up the structure of our database.
 public class AppDbContext : IdentityDbContext<ApplicationUser>, IDataProtectionKeyContext
 {
 
