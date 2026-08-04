@@ -65,7 +65,6 @@ const getCsrfToken = async () => {
     }
     const {csrfToken} = await result.json();
 
-    console.log("IT WORKED!", csrfToken)
     return csrfToken as string;
 }
 

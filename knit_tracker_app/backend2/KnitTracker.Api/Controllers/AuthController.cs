@@ -12,10 +12,10 @@ namespace KnitTracker.Api.Controllers;
 [Route("api")]
 public class AuthController : ControllerBase
 {
-    private readonly UserManager<ApplicationUser> _userManager;
-    private readonly SignInManager<ApplicationUser> _signInManager;
+    private readonly UserManager<KnitTrackerUser> _userManager;
+    private readonly SignInManager<KnitTrackerUser> _signInManager;
 
-    public AuthController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+    public AuthController(UserManager<KnitTrackerUser> userManager, SignInManager<KnitTrackerUser> signInManager)
     {
         _userManager = userManager;
         _signInManager = signInManager;
@@ -39,7 +39,7 @@ public class AuthController : ControllerBase
         }
 
         // Create a new user with the specified username and password
-        var user = new ApplicationUser { UserName = request.Username, Email = request.Email };
+        var user = new KnitTrackerUser { UserName = request.Username, Email = request.Email };
 
         var result = await _userManager.CreateAsync(user, request.Password);
 

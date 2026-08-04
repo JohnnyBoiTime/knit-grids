@@ -5,14 +5,14 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using KnitTracker.Api.Models;
 
-// Create the configurer
+// Create the configurer.
 var builder = WebApplication.CreateBuilder(args);
 
-// For failed requests.
+// For failed requests and JSON error responses.
 builder.Services.AddProblemDetails();
 
-// Notifies ASP.NEXT about our controllers and ensures that each
-// controller is validated correctly.
+// Ensures that the POST and PUT requests ar required to have
+// CSRF tokens by default.
 builder.Services.AddControllersWithViews( options =>
 {
     options.Filters.Add(
@@ -20,7 +20,7 @@ builder.Services.AddControllersWithViews( options =>
     );
 });
 
-// Using supabase
+// Use connection string from setup json.
 var connectionString =
     builder.Configuration.GetConnectionString(
         "DefaultConnection"
@@ -29,75 +29,79 @@ var connectionString =
         "Connection string 'DefaultConnection' is missing."
     );
 
+// Configures the database to use PostgreSQL and connection string.
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseNpgsql(connectionString);
 });
 
 // Persist important data in database to be re-used between container deployments or restarts.
-builder.Services.AddDataProtection().SetApplicationName("KnitTracker").PersistKeysToDbContext<AppDbContext>();
+// Stuff like CSRF tokens and auth cookies.
+builder.Services.AddDataProtection()
+    .SetApplicationName("KnitTracker")
+    .PersistKeysToDbContext<AppDbContext>();
 
-// Configures user stuff
+// Configures user stuff for user creations, passwords, things related
+// to users. Connects KnitTrackerUser to the identity tables in database.
 builder.Services
-    .AddIdentity<ApplicationUser, IdentityRole>()
-    .AddEntityFrameworkStores<AppDbContext>()
-    .AddDefaultTokenProviders();
+    .AddIdentity<KnitTrackerUser, IdentityRole>()
+    .AddEntityFrameworkStores<AppDbContext>() // 
+    .AddDefaultTokenProviders(); // Tokens for password resets and emails, to be implemented later.
 
-// Configure the authentication cookie
+// Configure the authentication cookie. Verifies who is making the request.
+// Ensures the request belongs to an authenticated user.
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.Cookie.Name = "knittracker-auth";
+    options.Cookie.Name = "knittracker-auth"; // Browser cookie name
 
-    options.Cookie.HttpOnly = true;
+    options.Cookie.HttpOnly = true; // Client-side JavasScript cannot access the cookie.
 
-    options.Cookie.Path = "/";
+    options.Cookie.Path = "/"; // Allows cookie to be sent to all routes.
 
     // For development
     if (builder.Environment.IsDevelopment())
     {
         options.Cookie.SameSite = SameSiteMode.Lax;
-        options.Cookie.SecurePolicy =
-            CookieSecurePolicy.SameAsRequest;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
     }
 
     // For production
     else
     {
         options.Cookie.SameSite = SameSiteMode.None; // Allow cross site cookies
-        options.Cookie.SecurePolicy =
-            CookieSecurePolicy.Always;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Use HTTPS for cookies in prod.
     }
 
 });
 
-// CSRF token required.
+// CSRF token configuration. Ensures requests are coming
+// from the front end.
 builder.Services.AddAntiforgery(options =>
 {
-    options.HeaderName = "X-CSRFToken";
+    options.HeaderName = "X-CSRFToken"; // Header for CSRF tokens.
 
     options.Cookie.Name = "knittracker-csrf";
     options.Cookie.HttpOnly = true;
     options.Cookie.Path = "/";
 
 
-    // For development.
+    // For development, lax security.
     if (builder.Environment.IsDevelopment())
     {
         options.Cookie.SameSite = SameSiteMode.Lax;
-        options.Cookie.SecurePolicy =
-            CookieSecurePolicy.SameAsRequest;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
     }
 
-    // For production.
+    // For production, ensure https and crosss site.
     else
     {
         options.Cookie.SameSite = SameSiteMode.None;
-        options.Cookie.SecurePolicy =
-            CookieSecurePolicy.Always;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     }
 });
 
-// Allow requests to be accepted from the vercel front end.
+// Allow requests to be accepted from the vercel front end or any other
+// front end that is specified.
 var frontendOrigins =
     builder.Configuration
         .GetSection("Frontend:AllowedOrigins")
@@ -106,21 +110,21 @@ var frontendOrigins =
         "Frontend:AllowedOrigins is missing."
     );
 
-// Cross origin reference securuity configuration
+// Cross origin reference security configuration
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("NextFrontend", policy =>
     {
         policy
            // .WithOrigins("http://localhost:3000")
-            .WithOrigins(frontendOrigins) // NEXT.JS/VERCEL front end easy.
+            .WithOrigins(frontendOrigins) // Specified front end origins
             .AllowAnyHeader() // Have headers for each request
-            .AllowAnyMethod() // Allow GET, POST, PUT, DELETE http methods
+            .AllowAnyMethod() // Allow GET, POST, DELETE http methods
             .AllowCredentials(); // Include the auth cookie in each request
     });
 });
 
-// For HTTP Strict-Transport Security.
+// For HTTP Strict Transport Security.
 // Configures HSTS.
 builder.Services.AddHsts(options =>
 {
@@ -133,7 +137,10 @@ builder.Services.AddHsts(options =>
     APP SECTION
 */
 
+// Create the application using the above configuration.
 var app = builder.Build();
+
+// Middleware for errors or exceptions.
 
 // Tell ASP.NET that every reuqest uses HTTPS,
 // since google cloud run gaurantees https.
@@ -155,24 +162,26 @@ if (app.Environment.IsDevelopment())
 }
 
 // In production, tell browsers to use HTTPS for requests.
+// Also, handle exceptions using generic errors.
 else
 {
     app.UseExceptionHandler();
     app.UseHsts();
 }
 
-// Grab all the routes in the project to apply CORS to them.
+// Match requests from front end to matching endpoint in backend.
 app.UseRouting();
 
 app.UseCors("NextFrontend"); // Uses the CORS policy configured earlier
 
 // Deteermines who the user is and what they can do
-app.UseAuthentication();
-app.UseAuthorization();
+app.UseAuthentication(); // Who are you???
+app.UseAuthorization(); // Here is what you can do!
 
-// Map controller routes to endpoints
+// Map attributes to the endpoints (like [HttpGet], [HttpPost], etc.) to the controllers.
 app.MapControllers();
 
+// Start app.
 app.Run();
 
 

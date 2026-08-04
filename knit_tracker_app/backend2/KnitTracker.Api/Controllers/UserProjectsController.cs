@@ -9,17 +9,17 @@ using KnitTracker.Api.DataTransferObjects;
 
 namespace KnitTracker.Api.Controllers;
 
+// ControllerBase contains the API methods for handling requests and responses.
 [ApiController]
 [Route("api/userProjects/")]
 public class UserProjectsController : ControllerBase
 {
 
     private readonly AppDbContext _context;
-    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly UserManager<KnitTrackerUser> _userManager;
 
-    
-   // Turn info from database into JSON to send to front end to display users
-   // saved projects from the database
+   // Converts JSON information from the database to a C# object to be able to send to Next.js due to
+   // the ControllerBase methods converting C# objects to JSON's.
    private ProjectsDatabaseFormat ProjectInfoFromDatabase(KnittingProject project)
     {
         var needles = JsonSerializer.Deserialize<NeedleDto>(project.Needles) ?? new NeedleDto("", "");
@@ -68,7 +68,7 @@ public class UserProjectsController : ControllerBase
     }   
 
     // Inject the database context and user manager services to the controller.
-    public UserProjectsController(AppDbContext context, UserManager<ApplicationUser> userManager)
+    public UserProjectsController(AppDbContext context, UserManager<KnitTrackerUser> userManager)
     {
         _context = context;
         _userManager = userManager;
@@ -140,6 +140,7 @@ public class UserProjectsController : ControllerBase
                 });
             }
 
+            // Search for the project. 
             var existingProject = await _context.KnittingProjects
                 .SingleOrDefaultAsync(existingProject => 
                     existingProject.ProjectId == projectId &&
@@ -162,11 +163,15 @@ public class UserProjectsController : ControllerBase
 
         }
 
+
+        // Turn the project back into a json to save back into the database.
         UpdateDatabaseProjects(request, knittingProject);
 
         await _context.SaveChangesAsync();
 
-        // Send back the new saved info from the database.
+        // Send back the new saved info from the database. 
+        // Ok turns C# into JSON, so need to convert 
+        // query back into C# for safer serialization.
         return Ok(ProjectInfoFromDatabase(knittingProject));
     } 
 
@@ -207,7 +212,7 @@ public class UserProjectsController : ControllerBase
 
         _context.KnittingProjects.Remove(projectToDelete);
 
-        // Does the changes
+        // Does the changes/commits to the delete.
         await _context.SaveChangesAsync();
 
         return Ok(new

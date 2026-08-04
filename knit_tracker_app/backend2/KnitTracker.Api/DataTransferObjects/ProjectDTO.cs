@@ -1,5 +1,8 @@
 namespace KnitTracker.Api.DataTransferObjects;
 
+// Mad the needle and yarn into own DTO to keep
+// their information together.
+
 // For the needles.
 public record NeedleDto(string Type, string Size);
 
