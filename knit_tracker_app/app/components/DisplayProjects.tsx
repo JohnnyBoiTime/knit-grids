@@ -7,6 +7,7 @@ import {AppDispatch, RootState } from "../redux/store";
 import {useRouter} from "next/navigation"
 import { setNameOfProject, setStitches, setNeedleType, setNeedleSize, setYarnMaterial, setYarnWeight, setYarnYardage, setProjectID, reformatGrid, clearGrid, setNotes, setRowNotes, finishedProject, setProgressGrid, setAutofill  } from '../redux/slices/knittingProjectSlice'
 import Link from 'next/link'
+import { consoleAsyncStorage } from 'next/dist/server/app-render/console-async-storage.external';
 
 type UserSelectedProject = {
     projectId: string
@@ -47,22 +48,69 @@ export default function DisplayProjects() {
     const [projectName, setProjectName] = useState("") 
 
     // Does the user actually have saved projects?
-    const projects = data ? data : []
+    const usersExistingProjects = data ? data : []
 
 
-    const saveProject = async (knittingProject: UserSelectedProject) => {
+    // Create the knitting project
+    const handleCreatingKnittingProject = async (e: React.FormEvent) => {
+        e.preventDefault();
         try {
 
-            await addProject(knittingProject).unwrap()
+            // Save the blank project to the database.
+            const newProject = {
+                projectId: "",
+                nameOfProject: projectName,
+                stitches: Number(projectStitches),
+                needles: {
+                    type: "",
+                    size: "",
+                },
+                yarn: {
+                    material: "",
+                    weight: "",
+                    yardage: "",
+                },
+                notes: "",
+                rowNotes: [],
+                autofill: "",
+                progressGrid: [],
+                finished: false,
+            };
+            
+
+            console.log(newProject.stitches);
+
+            const createdProject = await addProject(newProject).unwrap()
+
+            dispatch(setProjectID(createdProject.projectId))
+            dispatch(setNameOfProject(projectName))
+            dispatch(setStitches(Number(projectStitches)))
+            dispatch(setNeedleType(""))
+            dispatch(setNeedleSize(""))
+            dispatch(setYarnMaterial(""))
+            dispatch(setYarnWeight(""))
+            dispatch(setYarnYardage(""))
+            dispatch(setNotes(""))
+            dispatch(setAutofill(""))
+            dispatch(setRowNotes([]))
+            dispatch(finishedProject(false))
+
+
+
+            router.push("/project-page")
 
         } catch (error) {
-            console.log("ERROR! " + error)
+            console.error("Could not save project!", error)
         }
     }
 
     // This is so we can display the selected projects information on the project page
     function displayUsersChosenProject(knittingProject: UserSelectedProject) {
-        dispatch(setProjectID(knittingProject.projectId))
+
+        event?.preventDefault();
+
+        console.log(knittingProject);
+
         dispatch(setNameOfProject(knittingProject.nameOfProject))
         dispatch(setStitches(knittingProject.stitches))
         dispatch(setNeedleType(knittingProject.needles.type))
@@ -75,7 +123,8 @@ export default function DisplayProjects() {
         dispatch(setAutofill(knittingProject.autofill))
         dispatch(reformatGrid(knittingProject.progressGrid))
         dispatch(finishedProject(false))
-        console.log(knittingProject)
+
+
     }
 
     // Creating a new project just sets these to blank values so a new one can be created.
@@ -128,7 +177,7 @@ export default function DisplayProjects() {
                 Saved projects:
             </p>
             <ul>
-                {projects.map((project) => (
+                {usersExistingProjects.map((project) => (
                     <li key={project.projectId}>
                         <div className={displayProjectStyles.displayedProjects}>
                             <Link href="/project-page" onClick={() => displayUsersChosenProject(project)}>
@@ -145,7 +194,7 @@ export default function DisplayProjects() {
             </ul>
             <div>
                 Create a new project!
-                <form onSubmit={createNewProject}>
+                <form onSubmit={handleCreatingKnittingProject}>
                     <div>
                         <input
                         className="w-55" 

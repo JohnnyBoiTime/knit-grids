@@ -68,30 +68,36 @@ const getCsrfToken = async () => {
     return csrfToken as string;
 }
 
-// The service to send and retrive the knitting project details with the database
+// The service to send and retrive the knitting project details with he backend!
 export const savedKnittingProjectsAPI = createApi({
-    reducerPath: "knittingProjects",
+    reducerPath: "knittingProjects", // Store the state in the store under knittingProjects
     baseQuery: fetchBaseQuery({
         // baseUrl: process.env.NEXT_PUBLIC_DJANGO_API_ROUTE,
+        // Every base query will include credientials and point to the backend
         baseUrl: `${process.env.NEXT_PUBLIC_ASPNET_API_ROUTE}/api`,
         credentials: "include",
     }),
-    tagTypes: ['KnittingProjects'],
+    tagTypes: ['KnittingProjects'], // Cache tags for refreshing information when changing information.
     endpoints: (builder) => {
         return {
 
-            // Grab all of the users projects
+            // Grab all of the users projects. Query => Grab data.
+            // Return data in format of KnitProjectInfo[].
             getSavedKnittingProjects: builder.query<KnitProjectInfo[], void> ({
                 query: () => ({
                     url: "/userProjects/"
                 }),
                 providesTags: (result) => 
                     result 
+                // Caches result so if we delete a project, we can refresh the list
+                // to reflect the deletion.
                     ?  ['KnittingProjects', ...result.map((res: KnitProjectInfo) => ({type: 'KnittingProjects' as const, id: res.projectId}))]
                     : ['KnittingProjects'],
             }),
 
-            // Adding a project
+            // Adding a project. Returns the project info in the format of KnitProjectInfo,
+            // and we put in the format of the project.
+            // This also modifies the project as well, so for both saving and modifying.
             addKnittingProject: builder.mutation<KnitProjectInfo, KnitProjectFormat>({
                 async queryFn(knitProject, queryAPI, extraOptions, baseQuery) {
                     try {
@@ -119,6 +125,7 @@ export const savedKnittingProjectsAPI = createApi({
                         return { data: res.data as KnitProjectInfo}
 
                     // We caught something bad during runtime :(
+                    // Stuff like csrf fetching error or JSON parsing failure.
                     } catch (error) {
                         return {
                             error: {
@@ -129,9 +136,52 @@ export const savedKnittingProjectsAPI = createApi({
                     }
                 },
 
-                // When saving a knitting project,
-                // we dont need to cache it since we just saved it,
-                // so we assume we dont wanna save the same thing again
+                // Refresh the cache due to a change of data,
+                // refetch the saving the project.
+                invalidatesTags: ['KnittingProjects']
+            }),
+            
+            // For updating an existing knitting project.
+            updateKnitingProject: builder.mutation<KnitProjectInfo, KnitProjectFormat>({
+                async queryFn(updateProject, api, options, baseQuery) {
+                        try {
+
+                        // Make the request
+                        const csrfToken = await getCsrfToken()
+                        const res = await baseQuery({
+                            url: "/userProjects/",
+                            method: "PUT",
+                            body: updateProject,
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': csrfToken,
+                            },
+                        })
+
+                        // See if we get any errors from the backend when
+                        // retrieving.
+                        // List of errors: https://redux-toolkit.js.org/rtk-query/api/fetchBaseQuery
+                        if ('error' in res) {
+                            return {error: res.error as FetchBaseQueryError}
+                        }
+
+                        // Got our data!
+                        return { data: res.data as KnitProjectInfo}
+
+                    // We caught something bad during runtime :(
+                    // Stuff like csrf fetching error or JSON parsing failure.
+                    } catch (error) {
+                        return {
+                            error: {
+                                status: 'CUSTOM_ERROR',
+                                error: error instanceof Error ? error.message : "Unknown error!"
+                            }
+                        }
+                    }
+                },
+
+                // Refresh the cache due to a change of data,
+                // refetch the saving the project.
                 invalidatesTags: ['KnittingProjects']
             }),
             
@@ -176,13 +226,13 @@ export const savedKnittingProjectsAPI = createApi({
                     }
                 },
 
-                // Fetch cache data again after delete
+                // Refresh cache by refetching information since we deleted a project.
                 invalidatesTags: ["KnittingProjects"]
             })
         }
     }
 })
 
-export const {useGetSavedKnittingProjectsQuery, useAddKnittingProjectMutation, useDeleteKnittingProjectMutation} = savedKnittingProjectsAPI
+export const {useGetSavedKnittingProjectsQuery, useAddKnittingProjectMutation, useUpdateKnitingProjectMutation, useDeleteKnittingProjectMutation} = savedKnittingProjectsAPI
 
 

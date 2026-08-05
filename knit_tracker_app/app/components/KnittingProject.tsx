@@ -6,7 +6,7 @@ import {setNeedleType, setNeedleSize, setYarnMaterial, setYarnWeight, setYarnYar
 import {useDispatch, useSelector} from "react-redux"
 import {AppDispatch } from "../redux/store";
 import { RootState } from "../redux/store";
-import { useAddKnittingProjectMutation } from "../redux/slices/saveKnittingProjectSlice"
+import { useAddKnittingProjectMutation, useUpdateKnitingProjectMutation } from "../redux/slices/saveKnittingProjectSlice"
 import {  CheckCircleIcon, CheckIcon, SaveCheck } from "lucide-react";
 
 type Stitches = string
@@ -39,13 +39,6 @@ type KnitProjectFormat = {
     finished: boolean
 }
 
-// Begins the project. first row is the cast ons,
-// has second row to initialize the grid itself.
-function createKnitProject(stitches: number, rows: number): Stitches[][] {
-    return Array.from({ length: rows }, 
-        () => Array.from({length: stitches}, () => ""))
-}
-
 /* The grid to store a persons knitting project progress/information */
 // stitches refers to the amount of cast-on stitches to start the project
 export default function KnittingProject({stitches, nameOfProject} : KnittingGridProps) {
@@ -53,8 +46,13 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
     // Before the states so we can set the default color to yellow
     const knittingProject = useSelector((state: RootState) => state.knittingProject)
 
+    /*
     // Mutation for saving a project
     const [addKnittingProject , {isLoading: isSaving}] = useAddKnittingProjectMutation()
+
+    */
+
+    const [updateKnitProject , {isLoading: isUpadting}] = useUpdateKnitingProjectMutation()
 
 
     const [selectedStitches, setSelectedStitches] = useState<Set<string>>(new Set())
@@ -91,8 +89,10 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
 
     useEffect(() => {
 
-        // Create grid when starting a new project
-        if (knittingProject.projectID === "Blank") {
+        // Create grid when starting a new project.
+        // Notes is chosen arbituarly since a new project will have no 
+        // new notes.
+        if (knittingProject.notes === "") {
 
             const startingArray = Array.from({length: 1}, 
                 () => Array.from({length: stitches}, () => ",")
@@ -139,13 +139,13 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
         }
     }
 
-    // Save a knitting project
+    // Update the knitting project
     const handleSavingKnittingProject = async (savedProject: KnitProjectFormat) => {
         try {
 
             console.log(savedProject)
 
-            const result = await addKnittingProject(savedProject).unwrap()
+            const result = await updateKnitProject(savedProject).unwrap()
 
             dispatch(setProjectID(result.projectId))
 
@@ -545,7 +545,7 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                         Save project
                     </button>
                     {/* Saving project, so show the icon */}
-                    {isSaving ? (
+                    {isUpadting ? (
                         <SaveCheck >
 
                         </SaveCheck>

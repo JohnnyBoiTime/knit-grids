@@ -95,12 +95,15 @@ public class UserProjectsController : ControllerBase
 
     }
 
-    // Save or grab single project from the database
+    // Save the newly created project to the database.
+    // Project ID must be blank.
     [Authorize]
     [HttpPost]
     public async Task<IActionResult> SaveProject(ProjectsDatabaseFormat request)
     {
         var userId = _userManager.GetUserId(User);
+
+        Console.WriteLine("HERE!");
 
         // Invalid user!
         if (userId is null)
@@ -113,60 +116,16 @@ public class UserProjectsController : ControllerBase
         var currentTime = DateTimeOffset.UtcNow;
 
         // A new project is being created.
-        if (request.ProjectId == "Blank")
+        knittingProject = new KnittingProject
         {
-            knittingProject = new KnittingProject
-            {
-                ProjectId = Guid.NewGuid(),
-                UserId = userId,
-                NameOfProject = request.NameOfProject,
-                CreatedAt = currentTime
-            };
+            ProjectId = Guid.NewGuid(),
+            UserId = userId,
+            NameOfProject = request.NameOfProject,
+            CreatedAt = currentTime
+        };
 
-            _context.KnittingProjects.Add(knittingProject);
-        }
-
-        // Project id already exists so we are just updating the data that exists
-        // in the database
-        else
-        {
-
-            // The project ID of what is being saved isnt good.
-            if (!Guid.TryParse(request.ProjectId, out var projectId))
-            {
-                return BadRequest( new
-                {
-                    detail = "Invalid project ID!"
-                });
-            }
-
-            // Search for the project. 
-            var existingProject = await _context.KnittingProjects
-                .SingleOrDefaultAsync(existingProject => 
-                    existingProject.ProjectId == projectId &&
-                    existingProject.UserId == userId 
-                );
-
-
-            // Make sure the project exists.
-            if (existingProject is null)
-                {
-                    return NotFound( new
-                    {
-                        detail = "Project cannot be found!"
-                    });
-                }
-
-
-            // It exists!
-            knittingProject = existingProject;
-
-        }
-
-
-        // Turn the project back into a json to save back into the database.
-        UpdateDatabaseProjects(request, knittingProject);
-
+        _context.KnittingProjects.Add(knittingProject);
+        
         await _context.SaveChangesAsync();
 
         // Send back the new saved info from the database. 
@@ -174,6 +133,60 @@ public class UserProjectsController : ControllerBase
         // query back into C# for safer serialization.
         return Ok(ProjectInfoFromDatabase(knittingProject));
     } 
+
+    // Put request for updating an existign projectin the datbaase.
+    [Authorize]
+    [HttpPut]
+    public async Task<IActionResult> UpdateProject(ProjectsDatabaseFormat request)
+    {
+
+        var userId = _userManager.GetUserId(User);
+
+        Console.WriteLine(request.Stitches);
+
+        KnittingProject knittingProject;
+
+        // The project ID of what is being saved isnt good.
+        if (!Guid.TryParse(request.ProjectId, out var projectId))
+        {
+            return BadRequest( new
+            {
+                detail = "Invalid project ID!"
+            });
+        }
+
+        // Search for the project. 
+        var existingProject = await _context.KnittingProjects
+            .SingleOrDefaultAsync(existingProject => 
+                existingProject.ProjectId == projectId &&
+                existingProject.UserId == userId 
+            );
+
+
+        // Make sure the project exists.
+        if (existingProject is null)
+            {
+                return NotFound( new
+                {
+                    detail = "Project cannot be found!"
+                });
+            }
+
+
+        // It exists!
+        knittingProject = existingProject;
+
+        Console.WriteLine("YAYAYA!");
+
+        // Turn the project back into a json to save back into the database.
+        UpdateDatabaseProjects(request, knittingProject);
+
+        await _context.SaveChangesAsync();
+
+        // Turn the info back to C# to send to front end.
+        return Ok(ProjectInfoFromDatabase(knittingProject));
+
+    }
 
     // Delete the project
     [Authorize]

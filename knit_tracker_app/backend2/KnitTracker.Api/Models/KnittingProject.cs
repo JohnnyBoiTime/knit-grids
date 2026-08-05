@@ -10,7 +10,7 @@ public class KnittingProject
 
     public required string UserId { get; set; }
 
-    public ApplicationUser? User { get; set; }
+    public KnitTrackerUser? User { get; set; }
 
     [MaxLength(50)]
     public required string NameOfProject { get; set; }
