@@ -95,8 +95,6 @@ export default function DisplayProjects() {
             dispatch(setRowNotes([]))
             dispatch(finishedProject(false))
 
-
-
             router.push("/project-page")
 
         } catch (error) {
