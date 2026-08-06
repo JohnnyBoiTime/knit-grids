@@ -176,8 +176,6 @@ public class UserProjectsController : ControllerBase
         // It exists!
         knittingProject = existingProject;
 
-        Console.WriteLine("YAYAYA!");
-
         // Turn the project back into a json to save back into the database.
         UpdateDatabaseProjects(request, knittingProject);
 
@@ -194,16 +192,12 @@ public class UserProjectsController : ControllerBase
     public async Task<IActionResult> DeleteProject([FromBody] DeleteProject request)
     {
 
-         Console.Write("Here");
         var userId = _userManager.GetUserId(User);
-
-       
 
         // Invalid user!
         if (userId is null)
         {
 
-             Console.Write("Here1");
             return Unauthorized();
         }
 
@@ -216,7 +210,6 @@ public class UserProjectsController : ControllerBase
         if (projectToDelete is null)
         {
 
-             Console.Write("Here2");
             return NotFound( new
             {
                 detail = "Requested project to delete was not found!"

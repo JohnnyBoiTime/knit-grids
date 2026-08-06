@@ -32,7 +32,27 @@ var connectionString =
 // Configures the database to use PostgreSQL and connection string.
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    options.UseNpgsql(connectionString);
+
+    // Use SQL server for development
+    if (builder.Environment.IsDevelopment())
+    {
+          // For local SQL server for development
+        options.UseSqlServer(
+                builder.Configuration.GetConnectionString(
+                    "DefaultConnection"
+                )
+        );
+    }
+
+    // Use Npsql for production
+    else
+    {
+        
+    }
+
+    // For prod
+    // options.UseNpgsql(connectionString);
+
 });
 
 // Persist important data in database to be re-used between container deployments or restarts.

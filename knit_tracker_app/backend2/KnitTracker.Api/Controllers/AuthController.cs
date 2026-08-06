@@ -46,7 +46,6 @@ public class AuthController : ControllerBase
         // Could not create the user
         if (!result.Succeeded)
         {
-             Console.WriteLine("FAILED!!!");
 
             return BadRequest(new
 
@@ -103,7 +102,7 @@ public class AuthController : ControllerBase
 
     // Checks if user is authenticated. This is for a quick
     // check for things like persistent logins and other things
-    // rekated to autentication.
+    // related to authentication.
     [HttpGet("currentAuthStatus")]
     [Authorize]
     public IActionResult GetAuthStatus()

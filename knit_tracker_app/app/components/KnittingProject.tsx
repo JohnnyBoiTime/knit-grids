@@ -6,8 +6,10 @@ import {setNeedleType, setNeedleSize, setYarnMaterial, setYarnWeight, setYarnYar
 import {useDispatch, useSelector} from "react-redux"
 import {AppDispatch } from "../redux/store";
 import { RootState } from "../redux/store";
-import { useAddKnittingProjectMutation, useUpdateKnitingProjectMutation } from "../redux/slices/saveKnittingProjectSlice"
-import {  CheckCircleIcon, CheckIcon, SaveCheck } from "lucide-react";
+import csrfRoute  from "../apiRoutes/csrfAPI";
+import { useUpdateKnitingProjectMutation } from "../redux/slices/saveKnittingProjectSlice"
+import {  CheckCircleIcon, CheckIcon, SaveCheck, X } from "lucide-react";
+import { consoleAsyncStorage } from "next/dist/server/app-render/console-async-storage.external";
 
 type Stitches = string
 
@@ -52,13 +54,13 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
 
     */
 
-    const [updateKnitProject , {isLoading: isUpadting}] = useUpdateKnitingProjectMutation()
+    const [updateKnitProject , {isLoading: isUpdating}] = useUpdateKnitingProjectMutation()
 
 
     const [selectedStitches, setSelectedStitches] = useState<Set<string>>(new Set())
     const [toggleAutofill, setToggleAutofill] = useState(false)
+    const [toggleHighlight, setToggleHghlight] = useState(true)
     const [hasSaved, setHasSaved] = useState(true)
-    const [projectNotes, setProjectNotes] = useState("")
     const [rowNotes, setRowNotes] = useState([""])
     const [currentPosition, setCurrentPosition] = useState<string>(`${stitches},20`)
     const [color, setColor] = useState("yellow")
@@ -229,6 +231,8 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
 
             let stringIndex = 0
 
+            let newStitch = "";
+
             // This is so the autofill can carry on to the next row
             let additionalRows = 0
             if (startingCol + lengthOfAutofill > knittingProject.progressGrid[0].length && startingRow == knittingProject.progressGrid.length) {
@@ -252,8 +256,15 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
 
                                     const oldGrid = knittingProject.progressGrid[rowIndex]?.[colIndex] ?? "" 
                                     
-                                    
-                                    let newStitch = fillText[stringIndex] + ',' + color + ',' + '1'
+                                    // No highlighting
+                                    if (toggleHighlight == false) {
+                                        newStitch = fillText[stringIndex] + ',' + '' + ',' + '0'
+                                    }
+
+                                    // Highlighting
+                                    else {
+                                        newStitch = fillText[stringIndex] + ',' + color + ',' + '1'
+                                    }
 
                                     const key = rowIndex.toString() + "," + colIndex.toString()
 
@@ -345,17 +356,17 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
             </div >
             <div className={knitGrid.needles}>
                 <p> Needles: </p>
-                <input className={knitGrid.needleInfo} value={knittingProject?.needles.type} onChange={(e) => dispatch(setNeedleType(e.target.value))}/>
+                <input className={knitGrid.needleInfo} value={knittingProject?.needles?.type ?? ""} onChange={(e) => dispatch(setNeedleType(e.target.value))}/>
                 <p> Size: </p>
-                <input className={knitGrid.needleInfo} value={knittingProject?.needles.size} onChange={(e) => dispatch(setNeedleSize(e.target.value))}/>
+                <input className={knitGrid.needleInfo} value={knittingProject?.needles?.size ?? ""} onChange={(e) => dispatch(setNeedleSize(e.target.value))}/>
             </div>
             <div className={knitGrid.yarn}>
                 <p> Material: </p>
-                <input className={knitGrid.yarnInfo} value={knittingProject?.yarn.material} onChange={(e) => dispatch(setYarnMaterial(e.target.value))}/>
+                <input className={knitGrid.yarnInfo} value={knittingProject?.yarn?.material ?? ""} onChange={(e) => dispatch(setYarnMaterial(e.target.value))}/>
                 <p> Weight: </p>
-                <input className={knitGrid.yarnInfo} value={knittingProject?.yarn.weight} onChange={(e) => dispatch(setYarnWeight(e.target.value))}/>
+                <input className={knitGrid.yarnInfo} value={knittingProject?.yarn?.weight ?? ""} onChange={(e) => dispatch(setYarnWeight(e.target.value))}/>
                 <p> Yardage: </p>
-                <input className={knitGrid.yarnInfo} value={knittingProject?.yarn.yardage} onChange={(e) => dispatch(setYarnYardage(e.target.value))}/>
+                <input className={knitGrid.yarnInfo} value={knittingProject?.yarn?.yardage ?? ""} onChange={(e) => dispatch(setYarnYardage(e.target.value))}/>
                  <p className="ml-15" >More row info</p>
             </div>
             <div className={knitGrid.projectInfoLayout}>            
@@ -473,7 +484,18 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                 <textarea className={knitGrid.additionalProjectInfo} value={knittingProject.notes} onChange={(e) => dispatch(setNotes(e.target.value))}/> 
                 <div className="flex">
                     <p> Highlight color: </p>
-                    <input type="color" defaultValue={"#ffff00"} onChange={(event) => changeColorOfSelectedStitches(event.target.value + ',' + '1')}></input>
+                    {toggleHighlight ? (
+                        <>
+                            <input type="color" defaultValue={"#ffff00"} onChange={(event) => changeColorOfSelectedStitches(event.target.value + ',' + '1')}/>
+                            <CheckIcon style={{cursor: "pointer"}} onClick={() => setToggleHghlight(!toggleHighlight)}/>
+                            
+                        </>
+                    ): (
+                        <>
+                            <input type="color" disabled={true} defaultValue={"#ffff00"} ></input>
+                            <X style={{cursor: "pointer"}} onClick={() => setToggleHghlight(!toggleHighlight)}/>
+                        </>
+                    )}
                 </div>        
                 <div>
                     { selectedStitches.size > 0 ? (
@@ -520,7 +542,6 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                         </>
                     ) : (
                         <>
-
                         </>
                     )}
                 </div>
@@ -545,7 +566,7 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                         Save project
                     </button>
                     {/* Saving project, so show the icon */}
-                    {isUpadting ? (
+                    {isUpdating ? (
                         <SaveCheck >
 
                         </SaveCheck>
