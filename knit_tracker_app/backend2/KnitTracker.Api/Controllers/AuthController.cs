@@ -100,16 +100,18 @@ public class AuthController : ControllerBase
         });
     }
 
-    // Checks if user is authenticated. This is for a quick
-    // check for things like persistent logins and other things
-    // related to authentication.
+    // Checks if user is authenticated to determine
+    // if they can view certain pages.
     [HttpGet("currentAuthStatus")]
-    [Authorize]
+    [AllowAnonymous] // Can be logged in or not logged in
     public IActionResult GetAuthStatus()
     {
+
+        bool isAuthenticated = User.Identity?.IsAuthenticated == true;
+
         return Ok( new
         {
-            authenticated = true,
+            authenticated = isAuthenticated,
         });
     }
 }
