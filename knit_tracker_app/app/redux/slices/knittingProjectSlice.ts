@@ -72,6 +72,8 @@ const knittingProjectSlice = createSlice({
         },
 
         // Used to set specific attributes of the grid.
+        // NOTE: stitchInfo contains (separated by commas):
+        // name of stitch (string), color (string), bold text (1 = bold, 0 = none)
         setProgressGrid(state, action: PayloadAction<{stitchRow: number, col: number, stitchInfo: string}>) {
             const {stitchRow, col, stitchInfo} = action.payload
 

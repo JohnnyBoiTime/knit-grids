@@ -40,8 +40,6 @@ export default function DisplayProjects() {
 
     const dispatch = useDispatch<AppDispatch>();
 
-    const knittingProject = useSelector((state: RootState) => state.knittingProject)
-
     const router = useRouter()
 
     const [projectStitches, setProjectSitches] = useState("")
@@ -211,7 +209,7 @@ export default function DisplayProjects() {
                         required/>
                     </div>
                     <div>
-                        <button type="submit" style={{cursor: "pointer"}}>
+                        <button type="submit" style={{cursor: "pointer", textDecoration: 'underline'}}>
                             Create Project
                         </button>
                     </div>

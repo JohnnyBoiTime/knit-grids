@@ -36,7 +36,6 @@ const page = () => {
     verified();
 }, [])
 
-
   return (
     <DisplayProjects></DisplayProjects>
   )

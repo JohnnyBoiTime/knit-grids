@@ -342,11 +342,6 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
             dispatch(setProgressGridColors(updateColors))
     }
 
-    // Undoes the action if user wants to restart a stitch or coloring of a stitch
-    function undo() {
-
-    }
-
     // The users project information
     return  (
         // The grid to store a persons knitting project progress/info

@@ -45,13 +45,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     }
 
     // Use Npsql for production
-    else
+    if (builder.Environment.IsProduction())
     {
-        
+        options.UseNpgsql(connectionString);
     }
-
-    // For prod
-    // options.UseNpgsql(connectionString);
 
 });
 

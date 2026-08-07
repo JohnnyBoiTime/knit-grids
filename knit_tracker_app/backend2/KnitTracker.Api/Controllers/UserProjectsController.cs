@@ -103,20 +103,16 @@ public class UserProjectsController : ControllerBase
     {
         var userId = _userManager.GetUserId(User);
 
-        Console.WriteLine("HERE!");
-
         // Invalid user!
         if (userId is null)
         {
             return Unauthorized();
         }
 
-        KnittingProject knittingProject;
-
         var currentTime = DateTimeOffset.UtcNow;
 
         // A new project is being created.
-        knittingProject = new KnittingProject
+        KnittingProject knittingProject = new KnittingProject
         {
             ProjectId = Guid.NewGuid(),
             UserId = userId,
@@ -144,7 +140,6 @@ public class UserProjectsController : ControllerBase
 
         Console.WriteLine(request.Stitches);
 
-        KnittingProject knittingProject;
 
         // The project ID of what is being saved isnt good.
         if (!Guid.TryParse(request.ProjectId, out var projectId))
@@ -172,17 +167,13 @@ public class UserProjectsController : ControllerBase
                 });
             }
 
-
-        // It exists!
-        knittingProject = existingProject;
-
         // Turn the project back into a json to save back into the database.
-        UpdateDatabaseProjects(request, knittingProject);
+        UpdateDatabaseProjects(request, existingProject);
 
         await _context.SaveChangesAsync();
 
         // Turn the info back to C# to send to front end.
-        return Ok(ProjectInfoFromDatabase(knittingProject));
+        return Ok(ProjectInfoFromDatabase(existingProject));
 
     }
 
