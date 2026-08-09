@@ -133,8 +133,8 @@ builder.Services.AddCors(options =>
     options.AddPolicy("NextFrontend", policy =>
     {
         policy
-           // .WithOrigins("http://localhost:3000")
-            .WithOrigins(frontendOrigins) // Specified front end origins
+           //.WithOrigins("http://localhost:3000")
+           .WithOrigins(frontendOrigins) // Specified front end origins
             .AllowAnyHeader() // Have headers for each request
             .AllowAnyMethod() // Allow GET, POST, DELETE http methods
             .AllowCredentials(); // Include the auth cookie in each request

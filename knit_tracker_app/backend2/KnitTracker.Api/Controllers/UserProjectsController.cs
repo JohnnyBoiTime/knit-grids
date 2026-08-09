@@ -117,6 +117,7 @@ public class UserProjectsController : ControllerBase
             ProjectId = Guid.NewGuid(),
             UserId = userId,
             NameOfProject = request.NameOfProject,
+            Stitches = request.Stitches,
             CreatedAt = currentTime
         };
 
@@ -130,16 +131,13 @@ public class UserProjectsController : ControllerBase
         return Ok(ProjectInfoFromDatabase(knittingProject));
     } 
 
-    // Put request for updating an existign projectin the datbaase.
+    // Put request for updating an existing projectin the datbaase.
     [Authorize]
     [HttpPut]
     public async Task<IActionResult> UpdateProject(ProjectsDatabaseFormat request)
     {
 
         var userId = _userManager.GetUserId(User);
-
-        Console.WriteLine(request.Stitches);
-
 
         // The project ID of what is being saved isnt good.
         if (!Guid.TryParse(request.ProjectId, out var projectId))
@@ -176,6 +174,27 @@ public class UserProjectsController : ControllerBase
         return Ok(ProjectInfoFromDatabase(existingProject));
 
     }
+
+/*
+    // Get the total number of stitches that the user has knitted
+    [Authorize]
+    [HttpGet]
+    public async Task<IActionResult> GetTotalSitches()
+    {
+        var userId = _userManager.GetUserId(User);
+
+        var totalStitches = await _context.KnittingProjects
+            .Where(project => project.UserId == userId)
+            .Select(projects => projects.Stitches)
+            .SumAsync();
+
+        return Ok(new
+        {
+            numStitches = "Total stitches" + totalStitches
+        });
+    }
+
+    */
 
     // Delete the project
     [Authorize]

@@ -16,7 +16,8 @@ const csrfRoute = axios.create({
 });
    
 
-// This works for session based CSRF tokens
+// CSRF token intercepter, pretty much when a request is made,
+// fetch the csrf token.
 csrfRoute.interceptors.request.use(async (config) => {
 
     const token = await preCSRFF.get('/csrf/');
