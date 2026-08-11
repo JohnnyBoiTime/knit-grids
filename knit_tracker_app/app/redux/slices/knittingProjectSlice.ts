@@ -38,6 +38,7 @@ const initialState: KnittingProjectState = {
     rowNotes: [],
     autofill: "",
     progressGrid: [],
+    
     finished: false
 }
 

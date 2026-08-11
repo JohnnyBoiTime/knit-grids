@@ -94,7 +94,7 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
         // Create grid when starting a new project.
         // Notes is chosen arbituarly since a new project will have no 
         // new notes.
-        if (knittingProject.projectID === "Blank") {
+        if (knittingProject.needles.type === "") {
 
             const startingArray = Array.from({length: 1}, 
                 () => Array.from({length: stitches}, () => ",")
@@ -145,13 +145,17 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
     const handleSavingKnittingProject = async (savedProject: KnitProjectFormat) => {
         try {
 
-            console.log(savedProject)
+            if (savedProject.needles.type == "") {
+                
+            alert(`Knitting project MUST have at least the name of the needles to be saved!`)
 
-            const result = await updateKnitProject(savedProject).unwrap()
+            }
 
-            dispatch(setProjectID(result.projectId))
+            else {
+                await updateKnitProject(savedProject).unwrap()
 
-            setHasSaved(true)
+                setHasSaved(true)
+            }
 
         } catch (error) {
             console.error("Could not save project!", error)
