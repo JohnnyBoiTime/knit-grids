@@ -94,7 +94,7 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
         // Create grid when starting a new project.
         // Notes is chosen arbituarly since a new project will have no 
         // new notes.
-        if (knittingProject.notes === "") {
+        if (knittingProject.projectID === "Blank") {
 
             const startingArray = Array.from({length: 1}, 
                 () => Array.from({length: stitches}, () => ",")

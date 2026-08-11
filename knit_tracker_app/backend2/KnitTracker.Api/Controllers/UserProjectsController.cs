@@ -198,7 +198,7 @@ public class UserProjectsController : ControllerBase
 
     // Delete the project
     [Authorize]
-    [HttpDelete]
+    [HttpDelete] // Attributes: Tells compiler how to treat these
     public async Task<IActionResult> DeleteProject([FromBody] DeleteProject request)
     {
 
