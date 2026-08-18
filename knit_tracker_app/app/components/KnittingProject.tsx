@@ -6,10 +6,8 @@ import {setNeedleType, setNeedleSize, setYarnMaterial, setYarnWeight, setYarnYar
 import {useDispatch, useSelector} from "react-redux"
 import {AppDispatch } from "../redux/store";
 import { RootState } from "../redux/store";
-import csrfRoute  from "../apiRoutes/csrfAPI";
 import { useUpdateKnitingProjectMutation } from "../redux/slices/saveKnittingProjectSlice"
 import {  CheckCircleIcon, CheckIcon, SaveCheck, X } from "lucide-react";
-import { consoleAsyncStorage } from "next/dist/server/app-render/console-async-storage.external";
 
 type Stitches = string
 

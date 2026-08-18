@@ -118,7 +118,7 @@ public class AuthController : ControllerBase
         });
     }
 
-    // Deletes the user.
+    // Deletes the user's account and their projects.
     [Authorize]
     [HttpDelete("deleteAccount")]
     public async Task<IActionResult> DeleteAccount([FromBody] DeleteAccountRequest request)

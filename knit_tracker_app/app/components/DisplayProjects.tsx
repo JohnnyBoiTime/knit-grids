@@ -2,13 +2,12 @@
 import React, { useState } from 'react'
 import displayProjectStyles from './DisplayProjects.module.css'
 import{ useDeleteKnittingProjectMutation, useGetSavedKnittingProjectsQuery, useAddKnittingProjectMutation } from '../redux/slices/saveKnittingProjectSlice'
-import {useDispatch, useSelector} from "react-redux"
-import {AppDispatch, RootState } from "../redux/store";
+import {useDispatch} from "react-redux"
+import {AppDispatch} from "../redux/store";
 import {useRouter} from "next/navigation"
 import { setNameOfProject, setStitches, setNeedleType, setNeedleSize, setYarnMaterial, setYarnWeight, setYarnYardage, setProjectID, reformatGrid, clearGrid, setNotes, setRowNotes, finishedProject, setProgressGrid, setAutofill  } from '../redux/slices/knittingProjectSlice'
 import Link from 'next/link'
 import csrfRoute from '../apiRoutes/csrfAPI'
-import { consoleAsyncStorage } from 'next/dist/server/app-render/console-async-storage.external';
 
 type UserSelectedProject = {
     projectId: string
@@ -153,27 +152,6 @@ export default function DisplayProjects() {
 
     }
 
-    // Creating a new project just sets these to blank values so a new one can be created.
-    function createNewProject(e: React.FormEvent) {
-        e.preventDefault()
-
-        
-        dispatch(setProjectID("Blank"))
-        dispatch(setNameOfProject(projectName))
-        dispatch(setStitches(Number(projectStitches)))
-        dispatch(setNeedleType(""))
-        dispatch(setNeedleSize(""))
-        dispatch(setYarnMaterial(""))
-        dispatch(setYarnWeight(""))
-        dispatch(setYarnYardage(""))
-        dispatch(setNotes(""))
-        dispatch(setAutofill(""))
-        dispatch(setRowNotes([]))
-        dispatch(finishedProject(false))
-
-        router.push("/project-page")
-    }
-
     // Delete the project from saved projects
     const handeDeletingProject = async (knittingProjectId: string, knittingProjectName: string) => {
         try {
@@ -194,6 +172,7 @@ export default function DisplayProjects() {
 
     return (
         <div>
+            <Link href='/privacy-policy' >Privacy Policy</Link>
             <div style={{ 
                 display: 'flex',
                 justifyContent: 'space-between',
