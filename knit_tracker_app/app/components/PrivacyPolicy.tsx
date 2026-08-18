@@ -32,7 +32,7 @@ const PrivacyPolicy = () => {
     </br>
     1. Information We Collect
 
-<br>
+    <br>
     </br>
     <br>
     </br>
