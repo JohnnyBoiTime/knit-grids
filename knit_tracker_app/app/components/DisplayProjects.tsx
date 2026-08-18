@@ -56,17 +56,18 @@ export default function DisplayProjects() {
 
         if (confirmDeletion) {
 
-            const confirmDeletion = prompt("Type your password to delete your account")
+            const password = prompt("Type your password to delete your account")
+
+            console.log(password)
 
             await csrfRoute.delete('/deleteAccount', {
                 data: {
-                    confirmDeletion: confirmDeletion
+                    password: password
                 }
             })
 
             // Back to login
             router.replace("/")
-
 
         }
         else {

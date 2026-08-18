@@ -21,6 +21,10 @@ public record Login (
     bool RememberMe
 );
 
+public record DeleteAccountRequest(
+    string Password
+);
+
 // Class for logging in and registering.
 [ApiController]
 [Route("api")]
@@ -117,7 +121,7 @@ public class AuthController : ControllerBase
     // Deletes the user.
     [Authorize]
     [HttpDelete("deleteAccount")]
-    public async Task<IActionResult> DeleteAccount(string password)
+    public async Task<IActionResult> DeleteAccount([FromBody] DeleteAccountRequest request)
     {
         var user = await _userManager.GetUserAsync(User);
         
@@ -129,7 +133,7 @@ public class AuthController : ControllerBase
 
         // User must enter their password to confirm deletion. This is to hopefully ensure
         // user is absolutely ready to delete their account.
-        var confirmPassword = await _userManager.CheckPasswordAsync(user, password);
+        var confirmPassword = await _userManager.CheckPasswordAsync(user, request.Password);
 
         if (!confirmPassword)
         {
