@@ -44,9 +44,7 @@ public class AppDbContext : IdentityDbContext<KnitTrackerUser>, IDataProtectionK
             .HasForeignKey(project => project.UserId) // The projects userId points to the user in the user database
             .OnDelete(DeleteBehavior.Cascade); // Delete all knitting projects for the user
 
-        // User will most likely keep accessing the most recent project to complete it,
-        // so creating the composite index with the most recently updated project should
-        // allow faster queries.
+        // Index on updated at.
         builder.Entity<KnittingProject>()
             .HasIndex(project => new
             {

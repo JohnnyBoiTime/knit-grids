@@ -3,9 +3,23 @@ using KnitTracker.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration.UserSecrets;
 
 namespace KnitTracker.Api.Controllers;
 
+// Registration information
+public record Registration (
+    string Username,
+    string Email,
+    string Password
+);
+
+// Login information
+public record Login (
+    string Username,
+    string Password,
+    bool RememberMe
+);
 
 // Class for logging in and registering.
 [ApiController]
@@ -100,6 +114,40 @@ public class AuthController : ControllerBase
         });
     }
 
+    // Deletes the user.
+    [Authorize]
+    [HttpDelete("deleteAccount")]
+    public async Task<IActionResult> DeleteAccount(string password)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        
+        // User is not found.
+        if (user is null)
+        {
+            return NotFound();
+        }
+
+        // User must enter their password to confirm deletion. This is to hopefully ensure
+        // user is absolutely ready to delete their account.
+        var confirmPassword = await _userManager.CheckPasswordAsync(user, password);
+
+        if (!confirmPassword)
+        {
+            return BadRequest(new
+            {
+                detail = "Password is incorrect."
+            });
+        }
+
+        await _userManager.DeleteAsync(user);
+
+        return Ok(new
+        {
+            message = "Your account has been deleted"
+        });
+
+    }
+
     // Checks if user is authenticated to determine
     // if they can view certain pages.
     [HttpGet("currentAuthStatus")]
@@ -115,18 +163,3 @@ public class AuthController : ControllerBase
         });
     }
 }
-
-
-// Registration information
-public record Registration (
-    string Username,
-    string Email,
-    string Password
-);
-
-// Login information
-public record Login (
-    string Username,
-    string Password,
-    bool RememberMe
-);

@@ -62,12 +62,10 @@ const LoginPage = () => {
 
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
-                setErrorMessage(error.message)
+                setErrorMessage("Loggin error!")
             }
         }
     }
-
-
 
     // For the loading animation thing to make it feel like it is loading.
     // Sometimes, it will just not have an "animation". this

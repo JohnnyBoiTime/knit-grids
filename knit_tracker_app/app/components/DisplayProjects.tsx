@@ -7,6 +7,7 @@ import {AppDispatch, RootState } from "../redux/store";
 import {useRouter} from "next/navigation"
 import { setNameOfProject, setStitches, setNeedleType, setNeedleSize, setYarnMaterial, setYarnWeight, setYarnYardage, setProjectID, reformatGrid, clearGrid, setNotes, setRowNotes, finishedProject, setProgressGrid, setAutofill  } from '../redux/slices/knittingProjectSlice'
 import Link from 'next/link'
+import csrfRoute from '../apiRoutes/csrfAPI'
 import { consoleAsyncStorage } from 'next/dist/server/app-render/console-async-storage.external';
 
 type UserSelectedProject = {
@@ -48,10 +49,38 @@ export default function DisplayProjects() {
     // Does the user actually have saved projects?
     const usersExistingProjects = data ? data : []
 
+    // Delete the users account.
+    async function deleteAccount () {
+
+        const confirmDeletion = confirm("Are you sure you want to delete your account? ")
+
+        if (confirmDeletion) {
+
+            const confirmDeletion = prompt("Type your password to delete your account")
+
+            await csrfRoute.delete('/deleteAccount', {
+                data: {
+                    confirmDeletion: confirmDeletion
+                }
+            })
+
+            // Back to login
+            router.replace("/")
+
+
+        }
+        else {
+
+        }
+    }
 
     // Create the knitting project
     const handleCreatingKnittingProject = async (e: React.FormEvent) => {
+
+        // We are manually routing to the project page using
+        // next nav, no need for page refresh.
         e.preventDefault();
+
         try {
 
             // Save the blank project to the database.
@@ -164,8 +193,14 @@ export default function DisplayProjects() {
 
     return (
         <div>
-            <div>
+            <div style={{ 
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                width: '100%'
+             }}>
                 <Link href="/project-page" >Go Back to Current Project</Link> 
+                <button style={{cursor: 'pointer'}} onClick={deleteAccount}> Delete account </button>
             </div>
             <br>
             </br>
