@@ -18,19 +18,19 @@ const PrivacyPolicy = () => {
     <br>
     </br>
 
-    KnitTracker respects your privacy. This Privacy Policy explains what information KnitTracker collects, how that information is used, and the choices you have regarding your information.
+    KnitGrid respects your privacy. This Privacy Policy explains what information KnitGrid collects, how that information is used, and the choices you have regarding your information.
     <br>
     </br>
     <br>
     </br>
-    1. Information We Collect
+    1. Information KnitGrids collects
 
     <br>
     </br>
     <br>
     </br>
 
-    When you create and use a KnitTracker account, we may collect the following information:
+    When you create and use a KnitGrid account, the following information is stored/collected:
 
     * **Account information**, such as your username and email address.
     * **Authentication information** used to securely sign you into your account. Passwords are not stored in plain text.
@@ -49,11 +49,11 @@ const PrivacyPolicy = () => {
 
     Your information is used to:
 
-    * Create and maintain your KnitTracker account.
+    * Create and maintain your KnitGrid account.
     * Authenticate you when you sign in.
     * Save, retrieve, update, and delete your knitting projects.
 
-    KnitTracker does not sell your personal information.
+    KnitGrid does not sell your personal information.
 
 <br>
     </br>
@@ -67,9 +67,9 @@ const PrivacyPolicy = () => {
     <br>
     </br>
 
-    Projects you save to KnitTracker are associated with your account and are not made publicly available to other users.
+    Projects you save to KnitGrid are associated with your account and are not made publicly available to other users.
 
-    KnitTracker uses account authentication and access controls intended to prevent other users from accessing your saved projects.
+    KnitGrid uses account authentication and access controls intended to prevent other users from accessing your saved projects.
 
 <br>
     </br>
@@ -83,7 +83,7 @@ const PrivacyPolicy = () => {
     <br>
     </br>
 
-    KnitTracker uses cookies and similar browser technologies when necessary to provide the service.
+    KnitGrid uses cookies and similar browser technologies when necessary to provide the service.
 
     These may be used for purposes such as:
 
@@ -91,7 +91,7 @@ const PrivacyPolicy = () => {
     * Authenticating requests.
     * Remembering application information in your browser.
 
-    KnitTracker does not currently use advertising cookies or behavioral advertising trackers.
+    KnitGrid does not currently use advertising cookies or behavioral advertising trackers.
 
 <br>
     </br>
@@ -105,11 +105,11 @@ const PrivacyPolicy = () => {
     <br>
     </br>
 
-    KnitTracker relies on third-party infrastructure and service providers to operate the website, including services used for website hosting, backend hosting, databases, and related infrastructure.
+    KnitGrid relies on third-party infrastructure and service providers to operate the website, including services used for website hosting (vercel), backend hosting (google cloud), databases (supabase), and related infrastructure.
 
-    These providers may process or store information as necessary to provide their services to KnitTracker.
+    These providers may process or store information as necessary to provide their services to KnitGrid.
 
-    KnitTracker does not sell your information to these providers. Information is provided or processed only as necessary to operate, maintain, and secure the service.
+    KnitGrid does not sell your information to these providers. Information is provided or processed only as necessary to operate, maintain, and secure the service.
 
 <br>
     </br>
@@ -123,7 +123,7 @@ const PrivacyPolicy = () => {
     <br>
     </br>
 
-    KnitTracker uses reasonable technical measures intended to protect your information, including secure authentication, encrypted network connections, and access controls.
+    KnitGrid uses reasonable technical measures intended to protect your information, including secure authentication, encrypted network connections, and access controls.
 
     However, no website, database, or method of transmitting information over the Internet can be guaranteed to be completely secure.
 
@@ -139,9 +139,9 @@ const PrivacyPolicy = () => {
     <br>
     </br>
 
-    You may delete your KnitTracker account by clicking "Delete Account" button on the top right of the saved projects page.
+    You may delete your KnitGrid account by clicking "Delete Account" button on the top right of the saved projects page.
 
-    Deleting your account will delete the account and the knitting projects associated with it from the active KnitTracker database. Some information may remain temporarily in system logs, backups, or infrastructure operated by service providers where necessary for security, recovery, technical operation, or legal obligations.
+    Deleting your account will delete the account and the knitting projects associated with it from the active KnitGrid database. Some information may remain temporarily in system logs, backups, or infrastructure operated by service providers where necessary for security, recovery, technical operation, or legal obligations.
 
 <br>
     </br>
@@ -155,7 +155,7 @@ const PrivacyPolicy = () => {
     <br>
     </br>
 
-    This Privacy Policy may be updated when KnitTracker's features or data practices change.
+    This Privacy Policy may be updated when KnitGrid's features or data practices change.
 
     When significant changes are made, the updated policy will be posted on the website with a revised "Last Updated" date.
 
