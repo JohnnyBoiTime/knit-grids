@@ -129,6 +129,7 @@ const LoginPage = () => {
                 <button className="cursor-pointer" type="submit">
                     Login
                 </button>
+                {/*
                 <div style={{
                     display: "flex",
                     flexDirection: "row",
@@ -136,6 +137,7 @@ const LoginPage = () => {
                     marginLeft: "50px",
                     gap: "10px"
                 }}>
+                
                 Remember me:
                 <button 
                 type="button"
@@ -149,7 +151,7 @@ const LoginPage = () => {
                 }
                 </button>
                 </div>
-
+                */}
                 {loginStatus ? (
                     <p>
                         {loginProgess}
@@ -173,6 +175,9 @@ const LoginPage = () => {
                 </Link>
                 */}
             </div>
+        </div>
+        <div>
+            <Link href="/privacy-policy" >Privacy Policy</Link>
         </div>
     </div>
   )

@@ -4,13 +4,6 @@ const PrivacyPolicy = () => {
   return (
     <div>
 
-    <Link href="/saved-projects" > Back to projects</Link>
-
-    <br>
-    </br>
-    <br>
-    </br>
-
     Privacy Policy
 
     <br>
