@@ -210,7 +210,7 @@ export default function DisplayProjects() {
                         <input
                         className="w-55" 
                         type="number"
-                        placeholder="Stitch count"
+                        placeholder="Number of Cast On stitches"
                         value={projectStitches}
                         onChange={e => setProjectSitches(e.target.value)}
                         required/>
