@@ -111,14 +111,14 @@ const PrivacyPolicy = () => {
 
     KnitGrid does not sell your information to these providers. Information is provided or processed only as necessary to operate, maintain, and secure the service.
 
-<br>
+    <br>
     </br>
     <br>
     </br>
 
     6. Data Security
 
-<br>
+    <br>
     </br>
     <br>
     </br>
@@ -127,14 +127,14 @@ const PrivacyPolicy = () => {
 
     However, no website, database, or method of transmitting information over the Internet can be guaranteed to be completely secure.
 
-<br>
+    <br>
     </br>
     <br>
     </br>
 
     7. Account and Data Deletion
 
-<br>
+    <br>
     </br>
     <br>
     </br>
@@ -143,14 +143,14 @@ const PrivacyPolicy = () => {
 
     Deleting your account will delete the account and the knitting projects associated with it from the active KnitGrid database. Some information may remain temporarily in system logs, backups, or infrastructure operated by service providers where necessary for security, recovery, technical operation, or legal obligations.
 
-<br>
+    <br>
     </br>
     <br>
     </br>
 
     9. Changes to This Privacy Policy
 
-<br>
+    <br>
     </br>
     <br>
     </br>
@@ -159,7 +159,7 @@ const PrivacyPolicy = () => {
 
     When significant changes are made, the updated policy will be posted on the website with a revised "Last Updated" date.
 
-<br>
+    <br>
     </br>
     <br>
     </br>

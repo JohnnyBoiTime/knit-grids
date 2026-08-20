@@ -60,7 +60,7 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
     const [toggleHighlight, setToggleHghlight] = useState(true)
     const [hasSaved, setHasSaved] = useState(true)
     const [rowNotes, setRowNotes] = useState([""])
-    const [currentPosition, setCurrentPosition] = useState<string>(`${stitches},20`)
+    const [currentPosition, setCurrentPosition] = useState<string>(`1,${stitches}`)
     const [color, setColor] = useState("yellow")
     const [positionOfTools, setPositionOfTools] = useState(1)
     const [startSelecting, setStartSelecting] = useState<boolean>(false)
