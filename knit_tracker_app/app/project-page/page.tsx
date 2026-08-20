@@ -59,7 +59,7 @@ const page = () => {
 
   return (
     <div>
-    <div style={{display: 'flex', flexDirection: 'column'}}>
+    <div style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-start'}}>
         <Link href='/' onClick={logOut}>Log out</Link>
         <Link href='/saved-projects'> Saved projects</Link>
     </div>

@@ -6,6 +6,7 @@ import {setNeedleType, setNeedleSize, setYarnMaterial, setYarnWeight, setYarnYar
 import {useDispatch, useSelector} from "react-redux"
 import {AppDispatch } from "../redux/store";
 import { RootState } from "../redux/store";
+import Link from "next/link";
 import { useUpdateKnitingProjectMutation } from "../redux/slices/saveKnittingProjectSlice"
 import {  CheckCircleIcon, CheckIcon, SaveCheck, X } from "lucide-react";
 
@@ -198,24 +199,28 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
     // edit a row, etc.
     function selectMultipleStitches(stitchRow: number, column: number) {
 
-        if (startSelecting == true) {
-            // We will create a key from the row + column
-            // since that creates a unique value for each stitch.
-            // This also ensures we make a unique selection each time.
-            const key = stitchRow.toString() + "," + column.toString()
+        // We want to highlight things
+        if (toggleHighlight) {
 
-            // Select the new stitches
-            setSelectedStitches(previousSelected => {
-                const newlySelectedStitches = new Set(previousSelected)
-                newlySelectedStitches.add(key)
-                return newlySelectedStitches
-            })
+            if (startSelecting == true) {
+                // We will create a key from the row + column
+                // since that creates a unique value for each stitch.
+                // This also ensures we make a unique selection each time.
+                const key = stitchRow.toString() + "," + column.toString()
 
-            if (selectedStitches.has(key)) {
-                
-                const updateStitches = knittingProject.progressGrid[stitchRow][column].split(',')[0] + "," + color
+                // Select the new stitches
+                setSelectedStitches(previousSelected => {
+                    const newlySelectedStitches = new Set(previousSelected)
+                    newlySelectedStitches.add(key)
+                    return newlySelectedStitches
+                })
 
-                dispatch(setProgressGrid({stitchRow: stitchRow, col: column, stitchInfo: updateStitches}))
+                if (selectedStitches.has(key)) {
+                    
+                    const updateStitches = knittingProject.progressGrid[stitchRow][column].split(',')[0] + "," + color
+
+                    dispatch(setProgressGrid({stitchRow: stitchRow, col: column, stitchInfo: updateStitches}))
+                }
             }
         }
 
@@ -477,6 +482,7 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                 style={{
                     marginTop: positionOfTools
                 }}>
+                <Link href='/help'> [Click For Help] </Link>
                 <p>Project notes:</p>
                 <textarea className={knitGrid.additionalProjectInfo} value={knittingProject.notes} onChange={(e) => dispatch(setNotes(e.target.value))}/> 
                 <div className="flex">
