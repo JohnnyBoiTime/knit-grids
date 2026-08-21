@@ -127,7 +127,7 @@ const LoginPage = () => {
                     </div>
                 </div>
                 <button className="cursor-pointer" type="submit">
-                    Login
+                    [Login]
                 </button>
                 {/*
                 <div style={{
@@ -167,7 +167,7 @@ const LoginPage = () => {
                 flexDirection: "column"
             }}>
                 <Link href="/register">
-                    Create an Account
+                    [Create an Account]
                 </Link>
                 {/*
                 <Link href="/forgot-password">
@@ -177,7 +177,7 @@ const LoginPage = () => {
             </div>
         </div>
         <div>
-            <Link href="/privacy-policy" >Privacy Policy</Link>
+            <Link href="/privacy-policy" >[Privacy Policy]</Link>
         </div>
     </div>
   )

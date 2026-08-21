@@ -29,6 +29,13 @@ type UserSelectedProject = {
     finished: boolean
 }
 
+// Logs the user out.
+async function logOutUser() {
+
+    return csrfRoute.post('/logout/')
+    
+}
+
 export default function DisplayProjects() {
 
     // Retrieve all of the users projects
@@ -47,6 +54,15 @@ export default function DisplayProjects() {
 
     // Does the user actually have saved projects?
     const usersExistingProjects = data ? data : []
+
+        // Logout the user.
+    const logOut = async () => {
+        try {
+            await logOutUser()
+        } catch(error) {
+            console.log(error)
+        }
+    }
 
     // Delete the users account.
     async function deleteAccount () {
@@ -148,8 +164,6 @@ export default function DisplayProjects() {
         dispatch(setAutofill(knittingProject.autofill))
         dispatch(reformatGrid(knittingProject.progressGrid))
         dispatch(finishedProject(false))
-
-
     }
 
     // Delete the project from saved projects
@@ -172,18 +186,18 @@ export default function DisplayProjects() {
 
     return (
         <div>
-            <Link href='/privacy-policy' >Privacy Policy</Link>
             <div style={{ 
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 width: '100%'
              }}>
-                <Link href="/project-page" >Go Back to Current Project</Link> 
-                <button style={{cursor: 'pointer'}} onClick={deleteAccount}> Delete account </button>
+                <Link href='privac-policy' >[Privacy Policy]</Link>
+                <button style={{cursor: 'pointer'}} onClick={deleteAccount}> [Delete account] </button>
             </div>
             <br>
             </br>
+            <Link href='/' onClick={logOut}>[Log out]</Link>
             <p>
                 Saved projects:
             </p>
@@ -192,7 +206,7 @@ export default function DisplayProjects() {
                     <li key={project.projectId}>
                         <div className={displayProjectStyles.displayedProjects}>
                             <Link href="/project-page" onClick={() => displayUsersChosenProject(project)}>
-                                {project.nameOfProject}
+                                [{project.nameOfProject}]
                             </Link>
                             <button 
                                 className={displayProjectStyles.deleteButton}
@@ -204,7 +218,7 @@ export default function DisplayProjects() {
                 ))}
             </ul>
             <div>
-                Create a new project!
+                Create a new project below: 
                 <form onSubmit={handleCreatingKnittingProject}>
                     <div>
                         <input
@@ -224,8 +238,8 @@ export default function DisplayProjects() {
                         required/>
                     </div>
                     <div>
-                        <button type="submit" style={{cursor: "pointer", textDecoration: 'underline'}}>
-                            Create Project
+                        <button type="submit" style={{cursor: "pointer"}}>
+                            [Create Project]
                         </button>
                     </div>
                 </form>

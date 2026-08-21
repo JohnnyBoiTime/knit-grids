@@ -7,13 +7,6 @@ import {useRouter} from "next/navigation"
 import csrfRoute from "../apiRoutes/csrfAPI";
 import { RootState } from "../redux/store";
 
-// Logs the user out.
-async function logOutUser() {
-
-    return csrfRoute.post('/logout/')
-    
-}
-
 // Verify that there is a currently logged in
 // AND authorized user.
 async function verifyUser(): Promise<Authed> {
@@ -27,15 +20,6 @@ interface Authed {
 }
 
 const page = () => {
-
-    // Logout the user.
-    const logOut = async () => {
-        try {
-            await logOutUser()
-        } catch(error) {
-            console.log(error)
-        }
-    }
 
     const router = useRouter()
 
@@ -60,8 +44,7 @@ const page = () => {
   return (
     <div>
     <div style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-start'}}>
-        <Link href='/' onClick={logOut}>Log out</Link>
-        <Link href='/saved-projects'> Saved projects</Link>
+        <Link href='/saved-projects'> [Saved projects]</Link>
     </div>
     <br>
     </br>
