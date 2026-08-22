@@ -4,10 +4,12 @@ import loginStyles from './LoginPage.module.css'
 import csrfRoute from '../apiRoutes/csrfAPI'
 import Link from "next/link"
 import {Eye, EyeOff} from "lucide-react"
+import { useSearchParams } from 'next/navigation';
 
 interface ChangePassword {
+    email: string
+    token: string
     newPassword: string
-    confirmNewPassword: string
 }
 
 // Register the user
@@ -19,6 +21,12 @@ async function changePassword(data: ChangePassword) {
 
 const ChangePasswordPage = () => {
 
+    const requestParams = useSearchParams()
+
+    // Grab the email and token from the reset link
+    const email = requestParams.get("email")
+    const token = requestParams.get("token")
+
     const [newPassword, setNewPassword] = useState("")
     const [hideNewPassword, setHideNewPassword] = useState(true)
     const [confirmNewPassword, setConfirmNewPasswordPassword] = useState("")
@@ -28,14 +36,19 @@ const ChangePasswordPage = () => {
     async function registerForm(e: React.FormEvent) {
         e.preventDefault()
 
-        const response = await changePassword({newPassword, confirmNewPassword})
+        // narrow email and token to strings so typescript no complain.
+        if (!email || !token) {
+            return
+        }
+        
+        await changePassword({email, token, newPassword})
 
     }
 
   return (
     <div className={loginStyles.pageFormat}>
         <div className={loginStyles.loginPageTitle}>
-            Register
+            Reset Password
         </div>
         <div className={loginStyles.loginCard}>
             <form onSubmit={registerForm} className={loginStyles.formFormat}>
@@ -78,7 +91,7 @@ const ChangePasswordPage = () => {
                     </button>
                 </div>
                 <button className="cursor-pointer" type="submit">
-                    Register
+                    Change Password
                 </button>
             </form>
             <div>

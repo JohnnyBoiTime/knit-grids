@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using KnitTracker.Api.Models;
+using KnitTracker.Api.Services;
 
 // Create the configurer.
 var builder = WebApplication.CreateBuilder(args);
@@ -116,6 +117,9 @@ builder.Services.AddAntiforgery(options =>
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     }
 });
+
+// Use the gmail reset service when it is requested.
+builder.Services.AddScoped<IResetEmailService, ResetEmailService>();
 
 // Allow requests to be accepted from the vercel front end or any other
 // front end that is specified.

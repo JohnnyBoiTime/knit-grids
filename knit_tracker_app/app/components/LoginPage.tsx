@@ -62,7 +62,7 @@ const LoginPage = () => {
 
         } catch (error: unknown) {
             if (axios.isAxiosError(error)) {
-                setErrorMessage("Loggin error!")
+                setErrorMessage("Login error! Check username or password")
             }
         }
     }
@@ -169,11 +169,11 @@ const LoginPage = () => {
                 <Link href="/register">
                     [Create an Account]
                 </Link>
-                {/*
+                {
                 <Link href="/forgot-password">
-                    Forgot password
+                    [Forgot password]
                 </Link>
-                */}
+                }
             </div>
         </div>
         <div>

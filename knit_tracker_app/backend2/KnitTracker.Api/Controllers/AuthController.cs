@@ -1,8 +1,11 @@
+using System.Text;
 using KnitTracker.Api.Data;
 using KnitTracker.Api.Models;
+using KnitTracker.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration.UserSecrets;
 
 namespace KnitTracker.Api.Controllers;
@@ -25,6 +28,16 @@ public record DeleteAccountRequest(
     string Password
 );
 
+public record ForgotPassword (
+    string Email
+);
+
+public record ResetPassword (
+    string Email,
+    string Token,
+    string NewPassword
+);
+
 // Class for logging in and registering.
 [ApiController]
 [Route("api")]
@@ -32,11 +45,16 @@ public class AuthController : ControllerBase
 {
     private readonly UserManager<KnitTrackerUser> _userManager;
     private readonly SignInManager<KnitTrackerUser> _signInManager;
+    private readonly IResetEmailService _resetEmailService;
 
-    public AuthController(UserManager<KnitTrackerUser> userManager, SignInManager<KnitTrackerUser> signInManager)
+    public AuthController(UserManager<KnitTrackerUser> userManager, 
+        SignInManager<KnitTrackerUser> signInManager,
+        IResetEmailService resetEmailService 
+        )
     {
         _userManager = userManager;
         _signInManager = signInManager;
+        _resetEmailService = resetEmailService;
     }
 
     // Endpoint for registering
@@ -164,6 +182,100 @@ public class AuthController : ControllerBase
         return Ok( new
         {
             authenticated = isAuthenticated,
+        });
+    }
+
+    // User has forgot their password, so start
+    // password recovery process by sending
+    // them a password reset via e-mail
+    [HttpPost("forgotPassword")]
+    public async Task<IActionResult> ForgotPasswordEmail(ForgotPassword req)
+    {
+        var user = await _userManager.FindByEmailAsync(req.Email);
+
+        // User wasnt found, this exists so
+        // we exit if the email does not
+        // exist in the database. Also so a user
+        // cannot discover peoples emails registered.
+        if (user is null)
+        {
+            return Ok (new
+            {
+                message = "An email has been sent to: " + req.Email
+            });
+        }
+
+        // The valid password reset token, encoding the token, and sending the 
+        // url to the use's email
+        var passwordResetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+        var encodeToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(passwordResetToken));
+
+        var resetUrl =
+           $"https://knitgrids.vercel.app/reset-password" +
+           //$"http://localhost:3000/reset-password" +
+            $"?email={Uri.EscapeDataString(req.Email)}" +
+            $"&token={Uri.EscapeDataString(encodeToken)}";
+
+        await _resetEmailService.SendPasswordResetEmailAsync(
+            req.Email,
+            resetUrl
+        );
+
+        return Ok(new {
+            resetPasswordMessage = "An email has not been sent to: " + req.Email
+        });
+    }
+
+    // Resets the users password.
+    [HttpPost("resetPassword")]
+    public async Task<IActionResult> ResetPassword(ResetPassword req)
+    {
+        var user = await _userManager.FindByEmailAsync(req.Email);
+
+        if (user is null)
+        {
+            return BadRequest( new
+            {
+                message = "Password reset req is invalid!"
+            });
+        }
+
+        string token;
+
+        try
+        {
+            var decodeToken = WebEncoders.Base64UrlDecode(req.Token);
+
+            token = Encoding.UTF8.GetString(decodeToken); 
+        } 
+        catch
+        {
+            return BadRequest(new
+            {
+                message = "Invalid password reset token!"
+            });
+        }
+
+
+        var result = await _userManager.ResetPasswordAsync(
+            user,
+            token,
+            req.NewPassword
+            );
+        
+        if (!result.Succeeded)
+        {
+            return BadRequest(new
+            {
+                message = "Password could not be successfully reset",
+                errors = result.Errors.Select(error => error.Description)
+            });
+        }
+
+        return Ok(new
+        {
+            message = "Password has successfully been reset"
         });
     }
 }

@@ -12,7 +12,7 @@ interface ResetPassword {
 // Resets the users password to something else
 async function resetPassword(data: ResetPassword) {
 
-    return csrfRoute.post('/resetPassword/', data)
+    return csrfRoute.post('/forgotPassword/', data)
 
 }
 
@@ -30,7 +30,7 @@ const ForgotPassword = () => {
   return (
     <div className={loginStyles.pageFormat}>
         <div className={loginStyles.loginPageTitle}>
-            Register
+            Forgot password
         </div>
         <div className={loginStyles.loginCard}>
             <form onSubmit={sendResetPasswordEmail} className={loginStyles.formFormat}>
@@ -44,12 +44,12 @@ const ForgotPassword = () => {
                     />
                 </div>
                 <button className="cursor-pointer" type="submit">
-                    Send password change e-mail
+                    [Send password change e-mail]
                 </button>
             </form>
             <div>
                 <Link href="/">
-                    Back to login
+                    [Back to login]
                 </Link>
             </div>
         </div>
