@@ -8,3 +8,10 @@ You can also have all of your projects that you saved to access and edit at any 
 
 <img width="879" height="315" alt="Screenshot 2026-08-01 111355" src="https://github.com/user-attachments/assets/259a2a48-61be-40ee-a553-90224a64b619" />
 
+FEATURES:
+
+- Highlighting
+- Row notes + additional notes on your project
+- Autofill multiple stitches by just inputting a stitch pattern and pressing tab so you dont have to do individual stitches
+
+I wanted to keep this as simple as possible since its main purpose is to just help you keep track of your projects. 
