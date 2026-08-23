@@ -61,41 +61,52 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register(Registration request)
     {
-        var existingUser = await _userManager.FindByNameAsync(request.Username);
+        var existingUsername = await _userManager.FindByNameAsync(request.Username);
+
+        var existingEmail = await _userManager.FindByEmailAsync(request.Email);
 
         Console.WriteLine(request);
         
-        // The username is already registered in the system, so user must choose a different one
-        if (existingUser is not null)
+        // The username or email is already registered in the system.
+        if (existingEmail is not null)
+        {
+            return BadRequest(new
+            {
+                detail = "Email already exists!"
+            });
+        }
+        else if (existingUsername is not null)
         {
             return BadRequest(new
             {
                 detail = "Username already exists!"
             });
         }
+        else {
 
-        // Create a new user with the specified username and password
-        var user = new KnitTrackerUser { UserName = request.Username, Email = request.Email };
+            // Create a new user with the specified username and password
+            var user = new KnitTrackerUser { UserName = request.Username, Email = request.Email };
 
-        var result = await _userManager.CreateAsync(user, request.Password);
+            var result = await _userManager.CreateAsync(user, request.Password);
 
-        // Could not create the user
-        if (!result.Succeeded)
-        {
-
-            return BadRequest(new
-
-            // Json:
+            // Could not create the user
+            if (!result.Succeeded)
             {
-                detail = "Registration failed!",
-                errors = result.Errors.Select(error => error.Description)
+
+                return BadRequest(new
+
+                // Json:
+                {
+                    detail = "Registration failed!",
+                    errors = result.Errors.Select(error => error.Description)
+                });
+            }
+
+            return StatusCode(201, new
+            {
+                detail = "Registration is successful!"
             });
         }
-
-        return StatusCode(201, new
-        {
-            detail = "Registration is successful!"
-        });
 
     }
 
@@ -212,8 +223,8 @@ public class AuthController : ControllerBase
         var encodeToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(passwordResetToken));
 
         var resetUrl =
-           $"https://knitgrids.vercel.app/reset-password" +
-           //$"http://localhost:3000/reset-password" +
+           //$"https://knitgrids.vercel.app/reset-password" +
+           $"http://localhost:3000/reset-password" +
             $"?email={Uri.EscapeDataString(req.Email)}" +
             $"&token={Uri.EscapeDataString(encodeToken)}";
 
@@ -269,7 +280,6 @@ public class AuthController : ControllerBase
             return BadRequest(new
             {
                 message = "Password could not be successfully reset",
-                errors = result.Errors.Select(error => error.Description)
             });
         }
 

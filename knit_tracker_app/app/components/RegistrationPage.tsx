@@ -5,6 +5,7 @@ import {useRouter} from "next/navigation"
 import csrfRoute from '../apiRoutes/csrfAPI'
 import Link from "next/link"
 import {Eye, EyeOff} from "lucide-react"
+import axios from 'axios';
 
 interface User {
     username: string
@@ -44,7 +45,10 @@ const RegisterPage = () => {
             }
 
         } catch (error) {
-            console.log(error)
+            if (axios.isAxiosError(error)) {
+                alert(error.response?.data.detail)
+                console.log(error.response?.data.detail)
+            }
         }
 
     }

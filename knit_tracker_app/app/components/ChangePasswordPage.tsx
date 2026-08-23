@@ -2,6 +2,7 @@
 import React, { useState } from 'react'
 import loginStyles from './LoginPage.module.css'
 import csrfRoute from '../apiRoutes/csrfAPI'
+import axios from 'axios'
 import Link from "next/link"
 import {useRouter} from "next/navigation"
 import {Eye, EyeOff} from "lucide-react"
@@ -39,21 +40,28 @@ const ChangePasswordPage = () => {
     async function registerForm(e: React.FormEvent) {
         e.preventDefault()
 
-        // narrow email and token to strings so typescript no complain.
-        if (!email || !token) {
-            return
-        }
-        
-        if (newPassword !== confirmNewPassword) {
-            confirm("The passwords do not match.")
-        }
-        else {
-            await changePassword({email, token, newPassword})
-        
-            confirm("The password has been changed!")
+        try {
+            // narrow email and token to strings so typescript no complain.
+            if (!email || !token) {
+                return
+            }
             
-            router.replace("/")
+            if (newPassword !== confirmNewPassword) {
+                confirm("The passwords do not match.")
+            }
+            else {
+                await changePassword({email, token, newPassword})
             
+                alert("The password has been changed!")
+                
+                router.replace("/")
+                
+            }
+
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                alert("The password has not been changed: " + error.response?.data.message)
+            }
         }
 
     }
