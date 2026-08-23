@@ -199,7 +199,7 @@ public class AuthController : ControllerBase
         // cannot discover peoples emails registered.
         if (user is null)
         {
-            return Ok (new
+            return Ok(new
             {
                 message = "An email has been sent to: " + req.Email
             });
@@ -223,7 +223,7 @@ public class AuthController : ControllerBase
         );
 
         return Ok(new {
-            resetPasswordMessage = "An email has not been sent to: " + req.Email
+            message = "An email has not been sent to: " + req.Email
         });
     }
 

@@ -2,12 +2,12 @@
 import React, { useState } from 'react'
 import loginStyles from './LoginPage.module.css'
 import csrfRoute from '../apiRoutes/csrfAPI'
+import {useRouter} from "next/navigation"
 import Link from "next/link"
 
 interface ResetPassword {
     email: string
 }
-
 
 // Resets the users password to something else
 async function resetPassword(data: ResetPassword) {
@@ -20,11 +20,18 @@ const ForgotPassword = () => {
 
     const [email, setEmail] = useState("")
 
+    const router = useRouter()
+
     async function sendResetPasswordEmail(e: React.FormEvent) {
         e.preventDefault()
 
-        await resetPassword({email})
-
+        const response = await resetPassword({email})
+        
+        // Go back to login.
+        if (response.status == 200) {
+            router.replace("/")
+        }
+    
     }
 
   return (

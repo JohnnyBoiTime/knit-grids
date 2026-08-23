@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import loginStyles from './LoginPage.module.css'
 import csrfRoute from '../apiRoutes/csrfAPI'
 import Link from "next/link"
+import {useRouter} from "next/navigation"
 import {Eye, EyeOff} from "lucide-react"
 import { useSearchParams } from 'next/navigation';
 
@@ -32,6 +33,8 @@ const ChangePasswordPage = () => {
     const [confirmNewPassword, setConfirmNewPasswordPassword] = useState("")
     const [hideConfirmNewPassword, setHideConfirmNewPassword] = useState(true)
 
+        const router = useRouter()
+
 
     async function registerForm(e: React.FormEvent) {
         e.preventDefault()
@@ -41,7 +44,17 @@ const ChangePasswordPage = () => {
             return
         }
         
-        await changePassword({email, token, newPassword})
+        if (newPassword !== confirmNewPassword) {
+            confirm("The passwords do not match.")
+        }
+        else {
+            await changePassword({email, token, newPassword})
+        
+            confirm("The password has been changed!")
+            
+            router.replace("/")
+            
+        }
 
     }
 
@@ -74,7 +87,7 @@ const ChangePasswordPage = () => {
                 <div className="w">
                     <input 
                         type={hideConfirmNewPassword ? "password" : "text"}
-                        placeholder="Password"
+                        placeholder="Confirm Password"
                         value={confirmNewPassword}
                         onChange={e => setConfirmNewPasswordPassword(e.target.value)}
                         required
