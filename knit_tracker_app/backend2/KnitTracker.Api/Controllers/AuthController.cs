@@ -223,8 +223,8 @@ public class AuthController : ControllerBase
         var encodeToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(passwordResetToken));
 
         var resetUrl =
-           //$"https://knitgrids.vercel.app/reset-password" +
-           $"http://localhost:3000/reset-password" +
+           $"https://knitgrids.vercel.app/reset-password" +
+           // $"http://localhost:3000/reset-password" +
             $"?email={Uri.EscapeDataString(req.Email)}" +
             $"&token={Uri.EscapeDataString(encodeToken)}";
 
