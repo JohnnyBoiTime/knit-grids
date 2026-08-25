@@ -75,7 +75,6 @@ builder.Services.AddRateLimiter(options =>
                 PermitLimit = 3,
                 Window = TimeSpan.FromDays(1),
                 QueueLimit = 0,
-                AutoReplenishment = true
             });
     });
 });
@@ -222,9 +221,12 @@ app.UseRouting();
 
 app.UseCors("NextFrontend"); // Uses the CORS policy configured earlier
 
-// Deteermines who the user is and what they can do
+// Determines who the user is and what they can do
 app.UseAuthentication(); // Who are you???
 app.UseAuthorization(); // Here is what you can do!
+
+// Use the rate limiter
+app.UseRateLimiter();
 
 // Map attributes to the endpoints (like [HttpGet], [HttpPost], etc.) to the controllers.
 app.MapControllers();
