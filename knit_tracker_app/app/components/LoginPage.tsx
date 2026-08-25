@@ -170,6 +170,10 @@ const LoginPage = () => {
                 }
             </div>
         </div>
+        <br></br>
+        <br></br>
+        <Link href='try-it'> [Try it out!]</Link>
+        <br></br>
         <div>
             <Link href="/privacy-policy" >[Privacy Policy]</Link>
         </div>

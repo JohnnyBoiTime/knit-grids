@@ -80,6 +80,8 @@ const knittingProjectSlice = createSlice({
 
             state.progressGrid[stitchRow][col] = stitchInfo
         },
+
+        // To change all the colors at once.
         setProgressGridColors(state, action: PayloadAction<{stitchRow: number, stitchCol: number, stitchInfo: string}[]>) {
             action.payload.forEach((stitch) => {
                 state.progressGrid[stitch.stitchRow][stitch.stitchCol] = stitch.stitchInfo

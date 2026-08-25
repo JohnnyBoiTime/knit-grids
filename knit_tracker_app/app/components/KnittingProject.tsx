@@ -9,6 +9,7 @@ import { RootState } from "../redux/store";
 import Link from "next/link";
 import { useUpdateKnitingProjectMutation } from "../redux/slices/saveKnittingProjectSlice"
 import {  CheckCircleIcon, CheckIcon, SaveCheck, X } from "lucide-react";
+import { RuntimeError } from "next/dist/next-devtools/dev-overlay/container/runtime-error";
 
 type Stitches = string
 
@@ -16,6 +17,7 @@ type Stitches = string
 interface KnittingGridProps {
     stitches: number
     nameOfProject: string
+    demo: boolean
 }
 
 // Format of project we 
@@ -42,7 +44,7 @@ type KnitProjectFormat = {
 
 /* The grid to store a persons knitting project progress/information */
 // stitches refers to the amount of cast-on stitches to start the project
-export default function KnittingProject({stitches, nameOfProject} : KnittingGridProps) {
+export default function KnittingProject({stitches, nameOfProject, demo} : KnittingGridProps) {
 
     // Before the states so we can set the default color to yellow
     const knittingProject = useSelector((state: RootState) => state.knittingProject)
@@ -65,7 +67,6 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
     const [color, setColor] = useState("yellow")
     const [positionOfTools, setPositionOfTools] = useState(1)
     const [startSelecting, setStartSelecting] = useState<boolean>(false)
-    const [projectName, setProjectName] = useState<string>(() => nameOfProject) // Change project name
 
     const dispatch = useDispatch<AppDispatch>();
 
@@ -210,8 +211,13 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
 
                 // Select the new stitches
                 setSelectedStitches(previousSelected => {
+                     if (previousSelected.has(key)) {
+                        return previousSelected
+                    }
+
                     const newlySelectedStitches = new Set(previousSelected)
                     newlySelectedStitches.add(key)
+
                     return newlySelectedStitches
                 })
 
@@ -344,24 +350,37 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
 
         */
 
-            setColor(color)
+        try {
+        setColor(color)
             
-            dispatch(setProgressGridColors(updateColors))
+        dispatch(setProgressGridColors(updateColors))
+
+        // User is picking colors too quickly
+        // Prevents program from crashing due to
+        // too much rendering
+        } catch (error) {
+            alert("Slow down on picking colors! ")
+        }
     }
 
     // The users project information
     return  (
         // The grid to store a persons knitting project progress/info
         <div>
-            <div style={{display:'flex', flexDirection: 'row'}} >
-                <p>Project:</p>
-                <input maxLength={50} style={{paddingLeft: 5}} value={knittingProject.nameOfProject ?? ""} onChange={(e) => dispatch(setNameOfProject(e.target.value))}/>
-            </div>
+                {demo ?
+                (
+                    <></>
+                ) : (
+                <div style={{display:'flex', flexDirection: 'row'}} >
+                    <p>Project:</p>
+                     <input maxLength={50} style={{paddingLeft: 5}} value={knittingProject.nameOfProject ?? ""} onChange={(e) => dispatch(setNameOfProject(e.target.value))}/>
+                </div>
+                )}
             <br></br>
             Needle information:
             <div className={knitGrid.needles}>
                 <p> Type: </p>
-                <input className={knitGrid.needleInfo} maxLength={50} placeholder="Click to type" defaultValue={knittingProject.needles.type ?? "Enter needle"} value={knittingProject?.needles?.type ?? ""} onChange={(e) => dispatch(setNeedleType(e.target.value))}/>
+                <input className={knitGrid.needleInfo} maxLength={50} placeholder="Click to type" value={knittingProject?.needles?.type ?? ""} onChange={(e) => dispatch(setNeedleType(e.target.value))}/>
                 <p> Size: </p>
                 <input className={knitGrid.needleInfo} maxLength={25} placeholder="Click to type" value={knittingProject?.needles?.size ?? ""} onChange={(e) => dispatch(setNeedleSize(e.target.value))}/>
             </div>
@@ -505,7 +524,6 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                         <>
                             <input type="color" defaultValue={"#ffff00"} onChange={(event) => changeColorOfSelectedStitches(event.target.value + ',' + '1')}/>
                             <CheckIcon style={{cursor: "pointer"}} onClick={() => setToggleHghlight(!toggleHighlight)}/>
-                            
                         </>
                     ): (
                         <>
@@ -568,42 +586,49 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                     display: "flex",
                     flexDirection: "row"
                 }}>
-                    <button 
-                    className={knitGrid.saveProjectButton} 
-                    onClick={() => handleSavingKnittingProject({
-                        projectId: knittingProject.projectID,
-                        nameOfProject: nameOfProject, 
-                        stitches: stitches,
-                        needles: knittingProject.needles,
-                        yarn: knittingProject.yarn,
-                        progressGrid: knittingProject.progressGrid,
-                        notes: knittingProject.notes,
-                        rowNotes: rowNotes,
-                        autofill: knittingProject.autofill,
-                        finished: false,
-                        })}> 
-                        Save project
-                    </button>
-                    {/* Saving project, so show the icon */}
-                    {isUpdating ? (
-                        <SaveCheck >
-
-                        </SaveCheck>
-                    ) :
-                    (
-                        <>
-                        </>
-                    )
-                    }
-                    {hasSaved ? (
+                    {demo ? ( 
                         <></>
                     ) : (
-                        <div style={{
-                            paddingTop: 5
-                        }}>
-                        <p>
-                        (This project has unsaved changes, make sure to save before exiting or else progress can be lost!)
-                        </p>
+                        <div>
+                        <button 
+                        className={knitGrid.saveProjectButton} 
+                        onClick={() => handleSavingKnittingProject({
+                            projectId: knittingProject.projectID,
+                            nameOfProject: nameOfProject,
+                            stitches: stitches,
+                            needles: knittingProject.needles,
+                            yarn: knittingProject.yarn,
+                            progressGrid: knittingProject.progressGrid,
+                            notes: knittingProject.notes,
+                            rowNotes: rowNotes,
+                            autofill: knittingProject.autofill,
+                            finished: false,
+                            })}> 
+                            Save project
+                        </button>
+ 
+                        {/* Saving project, so show the icon */}
+                        {isUpdating ? (
+                            <SaveCheck >
+
+                            </SaveCheck>
+                        ) :
+                        (
+                            <>
+                            </>
+                        )
+                        }
+                        {hasSaved ? (
+                            <></>
+                        ) : (
+                            <div style={{
+                                paddingTop: 5
+                            }}>
+                            <p>
+                            (This project has unsaved changes, make sure to save before exiting or else progress can be lost!)
+                            </p>
+                            </div>
+                        )}
                         </div>
                     )}
                 </div>

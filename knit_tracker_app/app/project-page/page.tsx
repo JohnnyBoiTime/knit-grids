@@ -49,7 +49,7 @@ const page = () => {
     <br>
     </br>
     <div>
-        <KnittingProject stitches={knittingProject.stitches} nameOfProject={knittingProject.nameOfProject}></KnittingProject>
+        <KnittingProject stitches={knittingProject.stitches} nameOfProject={knittingProject.nameOfProject} demo={false}></KnittingProject>
     </div>
     </div>
   )
