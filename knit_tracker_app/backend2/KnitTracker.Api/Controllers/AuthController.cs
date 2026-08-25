@@ -5,6 +5,7 @@ using KnitTracker.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration.UserSecrets;
 
@@ -200,6 +201,7 @@ public class AuthController : ControllerBase
     // password recovery process by sending
     // them a password reset via e-mail
     [HttpPost("forgotPassword")]
+    [EnableRateLimiting("forgotPassword")]
     public async Task<IActionResult> ForgotPasswordEmail(ForgotPassword req)
     {
         var user = await _userManager.FindByEmailAsync(req.Email);
@@ -234,7 +236,7 @@ public class AuthController : ControllerBase
         );
 
         return Ok(new {
-            message = "An email has not been sent to: " + req.Email
+            message = "An email has been sent to: " + req.Email
         });
     }
 

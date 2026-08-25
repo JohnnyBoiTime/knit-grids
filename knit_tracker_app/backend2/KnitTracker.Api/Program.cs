@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using KnitTracker.Api.Models;
 using KnitTracker.Api.Services;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.RateLimiting;
 
 // Create the configurer.
 var builder = WebApplication.CreateBuilder(args);
@@ -51,6 +53,31 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         options.UseNpgsql(connectionString);
     }
 
+});
+
+// Rate limiter policies for endpoints
+// to prevent abuse of spamming reset
+// password emails.
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    // Policy for forgot password endpoint. 3 requests/day.
+    options.AddPolicy("forgotPassword", options =>
+    {
+        // User specific.
+        string ip = options.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: ip,
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 3,
+                Window = TimeSpan.FromDays(1),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            });
+    });
 });
 
 // Persist important data in database to be re-used between container deployments or restarts.

@@ -4,14 +4,8 @@ import {useRouter} from "next/navigation"
 import loginStyles from './LoginPage.module.css'
 import csrfRoute from '../apiRoutes/csrfAPI'
 import Link from "next/link"
-import {SquareCheckBig, Eye, EyeOff, Square, Text} from "lucide-react"
+import { Eye, EyeOff} from "lucide-react"
 import axios from 'axios';
-
-interface User {
-    username: string
-    email: string
-    password: string
-}
 
 interface Login {
     username: string

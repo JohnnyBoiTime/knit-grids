@@ -192,7 +192,7 @@ export default function DisplayProjects() {
                 alignItems: 'center',
                 width: '100%'
              }}>
-                <Link href='privac-policy' >[Privacy Policy]</Link>
+                <Link href='privacy-policy' >[Privacy Policy]</Link>
                 <button style={{cursor: 'pointer'}} onClick={deleteAccount}> [Delete account] </button>
             </div>
             <br>
@@ -223,6 +223,7 @@ export default function DisplayProjects() {
                     <div>
                         <input
                         className="w-55" 
+                        max={1000}
                         type="number"
                         placeholder="Number of Cast On stitches"
                         value={projectStitches}
@@ -232,6 +233,7 @@ export default function DisplayProjects() {
                         <input
                         className="w-55" 
                         type="text"
+                        maxLength={50}
                         placeholder="Name of Project"
                         value={projectName}
                         onChange={e => setProjectName((e.target.value))}

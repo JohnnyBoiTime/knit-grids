@@ -4,6 +4,7 @@ import loginStyles from './LoginPage.module.css'
 import csrfRoute from '../apiRoutes/csrfAPI'
 import {useRouter} from "next/navigation"
 import Link from "next/link"
+import axios from 'axios';
 
 interface ResetPassword {
     email: string
@@ -25,12 +26,20 @@ const ForgotPassword = () => {
     async function sendResetPasswordEmail(e: React.FormEvent) {
         e.preventDefault()
 
+        try {
         const response = await resetPassword({email})
         
         // Go back to login.
         if (response.status == 200) {
             router.replace("/")
         }
+    } catch (error) {
+        if (axios.isAxiosError(error)) {
+            if (error.response?.status === 429) {
+                alert("Too many requests! Try again tomorrow.")
+            }
+        }
+    }
     
     }
 

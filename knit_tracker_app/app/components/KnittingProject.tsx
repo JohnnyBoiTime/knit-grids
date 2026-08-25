@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import knitGrid from "./KnittingGrid.module.css"
-import {setNeedleType, setNeedleSize, setYarnMaterial, setYarnWeight, setYarnYardage, setProgressGrid, setProgressGridColors, reformatGrid, setNotes, setAutofill, clearGrid, setProjectID} from "../redux/slices/knittingProjectSlice"
+import {setNeedleType, setNeedleSize, setYarnMaterial, setYarnWeight, setYarnYardage, setProgressGrid, setProgressGridColors, reformatGrid, setNotes, setAutofill, clearGrid, setProjectID, setNameOfProject} from "../redux/slices/knittingProjectSlice"
 import {useDispatch, useSelector} from "react-redux"
 import {AppDispatch } from "../redux/store";
 import { RootState } from "../redux/store";
@@ -353,22 +353,26 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
     return  (
         // The grid to store a persons knitting project progress/info
         <div>
-            <div className={knitGrid.projectHeaders}>
-                <p>Knitting project: {projectName}</p>
-            </div >
-            <div className={knitGrid.needles}>
-                <p> Needles: </p>
-                <input className={knitGrid.needleInfo} value={knittingProject?.needles?.type ?? ""} onChange={(e) => dispatch(setNeedleType(e.target.value))}/>
-                <p> Size: </p>
-                <input className={knitGrid.needleInfo} value={knittingProject?.needles?.size ?? ""} onChange={(e) => dispatch(setNeedleSize(e.target.value))}/>
+            <div style={{display:'flex', flexDirection: 'row'}} >
+                <p>Project:</p>
+                <input maxLength={50} style={{paddingLeft: 5}} value={knittingProject.nameOfProject ?? ""} onChange={(e) => dispatch(setNameOfProject(e.target.value))}/>
             </div>
+            <br></br>
+            Needle information:
+            <div className={knitGrid.needles}>
+                <p> Type: </p>
+                <input className={knitGrid.needleInfo} maxLength={50} placeholder="Click to type" defaultValue={knittingProject.needles.type ?? "Enter needle"} value={knittingProject?.needles?.type ?? ""} onChange={(e) => dispatch(setNeedleType(e.target.value))}/>
+                <p> Size: </p>
+                <input className={knitGrid.needleInfo} maxLength={25} placeholder="Click to type" value={knittingProject?.needles?.size ?? ""} onChange={(e) => dispatch(setNeedleSize(e.target.value))}/>
+            </div>
+            Yarn information:
             <div className={knitGrid.yarn}>
-                <p> Material: </p>
-                <input className={knitGrid.yarnInfo} value={knittingProject?.yarn?.material ?? ""} onChange={(e) => dispatch(setYarnMaterial(e.target.value))}/>
-                <p> Weight: </p>
-                <input className={knitGrid.yarnInfo} value={knittingProject?.yarn?.weight ?? ""} onChange={(e) => dispatch(setYarnWeight(e.target.value))}/>
-                <p> Yardage: </p>
-                <input className={knitGrid.yarnInfo} value={knittingProject?.yarn?.yardage ?? ""} onChange={(e) => dispatch(setYarnYardage(e.target.value))}/>
+                <p>Material: </p>
+                <input className={knitGrid.yarnInfo} maxLength={75} placeholder="Click to type" value={knittingProject?.yarn?.material ?? ""} onChange={(e) => dispatch(setYarnMaterial(e.target.value))}/>
+                <p>Weight: </p>
+                <input className={knitGrid.yarnInfo} maxLength={30} placeholder="Click to type" value={knittingProject?.yarn?.weight ?? ""} onChange={(e) => dispatch(setYarnWeight(e.target.value))}/>
+                <p>Yardage: </p>
+                <input className={knitGrid.yarnInfo} maxLength={30} placeholder="Click to type" value={knittingProject?.yarn?.yardage ?? ""} onChange={(e) => dispatch(setYarnYardage(e.target.value))}/>
                  <p className="ml-15" >More row info</p>
             </div>
             <div className={knitGrid.projectInfoLayout}>            
@@ -385,7 +389,6 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                             style={{
                                 backgroundColor: knittingProject.progressGrid[rowNumber - 1][colIndex].split(',')[1] != "" ?  stitch.split(',')[1] : undefined,
                                 fontWeight: knittingProject.progressGrid[rowNumber - 1][colIndex].split(',')[1] != "" ? 'bold' : 'normal'
-
                             }}
                             key={colIndex} 
                             onMouseDown={() => setStartSelecting(true)}
@@ -396,9 +399,13 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                                     setSelectedStitches(new Set())
                                 }
 
+                                /* Deletes entire grid...For some reason?
+                                // do something with this later I kind of forgot why
+                                // this is here.
                                 if (event.key === "Delete") {
                                     dispatch(clearGrid())
                                 }
+                                */
 
                                 // Autofill feature!
                                 if (event.key === "Tab" && toggleAutofill == true && knittingProject.autofill) {
@@ -421,7 +428,8 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                                             // going back to a previous row in the project
                                             const updatedArray = Array.from({ length: rowNumber }, (_, rowIndex) => Array.from( { length: stitches }, 
                                                 (_, colIndex) => knittingProject.progressGrid[rowIndex]?.[colIndex]) ?? "");
-
+                                            
+                                            // Reposition the array near the end of the project!
                                             const newPosition = updatedArray.length * 23
                                             
                                             setPositionOfTools(newPosition)
@@ -457,14 +465,15 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                             }}
                             onMouseMove={() => selectMultipleStitches(rowNumber - 1, colIndex)}>
                                 <input 
-                                ref={(element) => {
+                                    ref={(element) => {
                                     // Grab the inputs ref to store in record
                                     inputRefs.current[`${rowNumber - 1},${colIndex}`] = element;
-                                }}
+                                }}  
                                     className={knitGrid.stitchInput}
                                     style={{
                                         color: knittingProject.progressGrid[rowNumber - 1][colIndex].split(',')[2] === '1' ? 'black' : 'white'
                                     }}
+                                    maxLength={30}
                                     value={stitch.split(',')[0]}
                                     onChange={(event) => updateIndividualStitch(rowNumber - 1, colIndex, event.target.value)}
                                 />
@@ -484,7 +493,12 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                 }}>
                 <Link href='/help'> [Click For Help] </Link>
                 <p>Project notes:</p>
-                <textarea className={knitGrid.additionalProjectInfo} value={knittingProject.notes} onChange={(e) => dispatch(setNotes(e.target.value))}/> 
+                {/* Poject notes */}
+                <textarea className={knitGrid.additionalProjectInfo}
+                    maxLength={5000} 
+                    value={knittingProject.notes} 
+                    onChange={(e) => dispatch(setNotes(e.target.value))}/> 
+                <p> {knittingProject.notes.length} / 5000 </p>
                 <div className="flex">
                     <p> Highlight color: </p>
                     {toggleHighlight ? (
@@ -499,7 +513,7 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                             <X style={{cursor: "pointer"}} onClick={() => setToggleHghlight(!toggleHighlight)}/>
                         </>
                     )}
-                </div>        
+                </div>
                 <div>
                     { selectedStitches.size > 0 ? (
                     <p>Press escape while clicked-into a stitch to cancel selected stitches. Click on the color box to change selected stitches color</p>
@@ -515,11 +529,12 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                     <p>
                         (Tab) Stitch autocomplete (NOTE* circle checkmark toggles autocomplete, will also autocomplete with highlight color, stitches are separated by space):
                     </p>
-
+                    {/* AUTOFILL */}
                     <textarea
                         style={{
                             border: "1px solid #ccc"
                         }}
+                        maxLength={stitches}
                         defaultValue={knittingProject.autofill}
                         onChange={(event) => dispatch(setAutofill(event.target.value))}>
                     </textarea>
@@ -534,6 +549,7 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                         </CheckIcon>
                     )}
                     </button>
+                    <p> {knittingProject.autofill.length} / {stitches}</p>
                 </div>
                 <div>
                     {/* If there is nothing in autofill, do not do anything */}
@@ -586,7 +602,7 @@ export default function KnittingProject({stitches, nameOfProject} : KnittingGrid
                             paddingTop: 5
                         }}>
                         <p>
-                        (This project has unsaved changes)
+                        (This project has unsaved changes, make sure to save before exiting or else progress can be lost!)
                         </p>
                         </div>
                     )}
