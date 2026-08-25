@@ -145,7 +145,8 @@ export default function DisplayProjects() {
         }
     }
 
-    // This is so we can display the selected projects information on the project page
+    // This is so we can display the selected projects information on the project page.
+    // This is for already existing projects.
     function displayUsersChosenProject(knittingProject: UserSelectedProject) {
 
         event?.preventDefault();
@@ -218,7 +219,7 @@ export default function DisplayProjects() {
                 ))}
             </ul>
             <div>
-                Create a new project below: 
+                Create a new project below (Remember to hit save project after creation!!!): 
                 <form onSubmit={handleCreatingKnittingProject}>
                     <div>
                         <input
