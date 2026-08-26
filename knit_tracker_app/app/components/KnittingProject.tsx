@@ -510,7 +510,7 @@ export default function KnittingProject({stitches, nameOfProject, demo} : Knitti
                 style={{
                     marginTop: positionOfTools
                 }}>
-                <Link href='/help'> [Click For Help] </Link>
+                <Link href='/help'> [Click For Help/Tips] </Link>
                 <p>Project notes:</p>
                 {/* Poject notes */}
                 <textarea className={knitGrid.additionalProjectInfo}

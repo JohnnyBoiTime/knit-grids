@@ -3,7 +3,9 @@ import React from 'react'
 const HelpPage = () => {
   return (
     <div>
-        <h1> How to use: </h1>
+        <h1> How to use/tips: </h1>
+        <br>
+        </br>
 
         <b> Going to next row </b>
         <br>
@@ -14,11 +16,21 @@ const HelpPage = () => {
         <br>
         </br>
 
-        <b> Going to a previous row/undoing changes </b>
+        <b> Going to a previous row</b>
         <br>
         </br>
         You can go to a <i>previous row</i> by clicking into a stitch of said row and pressing enter. 
         Going back <b>WILL</b> undo all changes made up to the end of that row you went back to.
+        <br>
+        </br>
+        <br>
+        </br>
+
+        <b> Erasing mistakes</b>
+        <br>
+        </br>
+        Lets say you have made a mistake and want to undo it. What you can do is put a space in the autofill and
+        disable highlighting. Now when you press tab at a specific place, it will erase what is there.
         <br>
         </br>
         <br>
