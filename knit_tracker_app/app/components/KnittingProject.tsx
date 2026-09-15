@@ -371,10 +371,13 @@ export default function KnittingProject({stitches, nameOfProject, demo} : Knitti
                 (
                     <></>
                 ) : (
-                <div style={{display:'flex', flexDirection: 'row'}} >
-                    <p>Project:</p>
-                     <input maxLength={50} style={{paddingLeft: 5}} value={knittingProject.nameOfProject ?? ""} onChange={(e) => dispatch(setNameOfProject(e.target.value))}/>
-                </div>
+                    <div>
+                        <div style={{display:'flex', flexDirection: 'row'}} >
+                            <p>Project:</p>
+                            <input maxLength={50} style={{paddingLeft: 5}} value={knittingProject.nameOfProject ?? ""} onChange={(e) => dispatch(setNameOfProject(e.target.value))}/>
+                        </div>
+                        <p>Total stitches: {knittingProject.progressGrid.flat().filter((stitch) => stitch.split(',')[0] !== "").length} </p>
+                    </div>
                 )}
             <br></br>
             Needle information:
