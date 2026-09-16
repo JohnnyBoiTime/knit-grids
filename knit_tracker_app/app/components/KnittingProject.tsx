@@ -92,8 +92,9 @@ export default function KnittingProject({stitches, nameOfProject, demo} : Knitti
     useEffect(() => {
 
         // Create grid when starting a new project.
-        // Notes is chosen arbituarly since a new project will have no 
-        // new notes.
+        // Type of needles is chosen because it is required to save,
+        // therefore if there is none, we know its a new project and
+        // we must make a new grid.
         if (knittingProject.needles.type === "") {
 
             const startingArray = Array.from({length: 1}, 
@@ -367,6 +368,8 @@ export default function KnittingProject({stitches, nameOfProject, demo} : Knitti
     return  (
         // The grid to store a persons knitting project progress/info
         <div>
+
+            {/* If its just the demo, no need to show this stuff. */}
                 {demo ?
                 (
                     <></>

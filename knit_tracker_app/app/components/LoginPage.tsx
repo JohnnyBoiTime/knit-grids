@@ -37,14 +37,15 @@ const LoginPage = () => {
     async function loginForm(e: React.FormEvent) {
         e.preventDefault()
 
+        setLoginStatus(true)
+
         try {
             const response = await loginUser({username, password, rememberMe})
 
             console.log(response)
 
             // Login credentials ok!
-            if (response.data.detail != "Invalid username or password") {
-                setLoginStatus(true)
+            if (response.data.detail != "Invalid username or password") { 
                 router.replace("/saved-projects")
                 setLoginStatus(false)
             }
