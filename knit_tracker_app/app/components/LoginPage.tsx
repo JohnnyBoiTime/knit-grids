@@ -75,7 +75,7 @@ const LoginPage = () => {
             const interval = setInterval(() => {
                 dotCount = (++dotCount) % 4; //, 4 dots
                 setLoginProgess(`Logging in${".".repeat(dotCount)}`);
-            }, 20);
+            }, 500);
 
             return () => clearInterval(interval)
         }
