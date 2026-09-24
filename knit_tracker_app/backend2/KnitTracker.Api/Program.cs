@@ -77,6 +77,22 @@ builder.Services.AddRateLimiter(options =>
                 QueueLimit = 0,
             });
     });
+
+    // Let people create 10 projects a day!
+    // To prevent spam.
+    options.AddPolicy("knitCreationLimiter", options =>
+    {
+        string ip = options.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: ip,
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 10,
+                Window = TimeSpan.FromDays(1),
+                QueueLimit = 0,
+            });
+    });
 });
 
 // Persist important data in database to be re-used between container deployments or restarts.

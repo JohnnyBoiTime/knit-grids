@@ -80,8 +80,6 @@ const LoginPage = () => {
             return () => clearInterval(interval)
         }
 
-
-
     }, [loginStatus])
 
   return (

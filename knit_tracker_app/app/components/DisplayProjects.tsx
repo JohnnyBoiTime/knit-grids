@@ -247,6 +247,9 @@ export default function DisplayProjects() {
                     </div>
                 </form>
             </div>
+            <div>
+                ({usersExistingProjects.length} / 50)
+            </div>
         </div>
     )
 }

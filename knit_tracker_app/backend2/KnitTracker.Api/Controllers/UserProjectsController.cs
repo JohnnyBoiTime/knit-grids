@@ -4,6 +4,7 @@ using KnitTracker.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using KnitTracker.Api.DataTransferObjects;
 
@@ -14,6 +15,8 @@ namespace KnitTracker.Api.Controllers;
 [Route("api/userProjects/")]
 public class UserProjectsController : ControllerBase
 {
+
+    const int maxProjectsForAUser = 20;
 
     private readonly AppDbContext _context;
     private readonly UserManager<KnitTrackerUser> _userManager;
@@ -99,6 +102,7 @@ public class UserProjectsController : ControllerBase
     // Project ID must be blank.
     [Authorize]
     [HttpPost]
+    [EnableRateLimiting("knitCreationLimiter")]
     public async Task<IActionResult> SaveProject(ProjectsDatabaseFormat request)
     {
         var userId = _userManager.GetUserId(User);
@@ -120,18 +124,36 @@ public class UserProjectsController : ControllerBase
             Stitches = request.Stitches,
             CreatedAt = currentTime
         };
-
-        _context.KnittingProjects.Add(knittingProject);
         
-        await _context.SaveChangesAsync();
+        // Count how many projects the user currently has.
+        int numOfKnittingProjects = await _context.KnittingProjects.CountAsync(
+            project => project.UserId == userId
+        );
 
-        // Send back the new saved info from the database. 
-        // Ok turns C# into JSON, so need to convert 
-        // query back into C# for safer serialization.
-        return Ok(ProjectInfoFromDatabase(knittingProject));
+        // User has reached the cap!
+        if (numOfKnittingProjects >= maxProjectsForAUser)
+        {
+            return BadRequest("The max amount of projects you can have is 50!");
+        }
+
+        // User can create a project since the cap is not reached.
+        else
+        {
+
+            _context.KnittingProjects.Add(knittingProject);
+            
+            await _context.SaveChangesAsync();
+
+            // Send back the new saved info from the database. 
+            // Ok turns C# into JSON, so need to convert 
+            // query back into C# for safer serialization.
+            return Ok(ProjectInfoFromDatabase(knittingProject));
+        
+        }
+        
     } 
 
-    // Put request for updating an existing projectin the datbaase.
+    // Put request for updating an existing project in the datbaase.
     [Authorize]
     [HttpPut]
     public async Task<IActionResult> UpdateProject(ProjectsDatabaseFormat request)
